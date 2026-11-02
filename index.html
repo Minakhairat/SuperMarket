@@ -450,25 +450,49 @@ table.custom-table tr:hover td{background: #f8fafc;}
 .contact-badge.wa:hover{background: #16a34a; color: white;}
 .footer-sub{font-size: 13px; color: var(--text-muted); margin-top: 6px;}
 
-/* Google Auth Pill */
-.google-user-pill{
-  display: flex; align-items: center; gap: 10px; background: #f8fafc;
-  border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 999px;
+/* Dynamic Per-User Auth Widget */
+.auth-widget{
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-login-trigger{
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: white; border: 0; padding: 7px 14px; border-radius: 999px;
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(2,132,199,0.25);
+  transition: all 0.2s;
+}
+.btn-login-trigger:hover{
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  transform: translateY(-1px);
+}
+.user-logged-pill{
+  display: flex; align-items: center; gap: 10px; background: #ffffff;
+  border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 999px;
   box-shadow: var(--shadow-sm); transition: all 0.2s;
 }
-.google-user-pill:hover{border-color: #94a3b8; background: #ffffff;}
-.google-avatar-wrap{
-  width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe;
-  display: flex; align-items: center; justify-content: center; font-size: 14px;
+.user-logged-pill:hover{border-color: #0284c7;}
+.user-avatar-wrap{
+  width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe; color: #0369a1;
+  display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;
+  overflow: hidden; flex-shrink: 0;
 }
-.google-user-info{display: flex; flex-direction: column; text-align: right;}
-.google-user-info strong{font-size: 13px; color: #0f172a;}
-.google-email{font-size: 11px; color: #64748b; font-family: monospace;}
-.google-live-badge{
+.user-avatar-wrap img{width: 100%; height: 100%; object-fit: cover;}
+.user-text-info{display: flex; flex-direction: column; text-align: right; line-height: 1.25;}
+.user-text-info strong{font-size: 12px; color: #0f172a;}
+.user-text-info .user-role-badge{font-size: 10px; color: #0284c7; font-weight: 700;}
+.user-text-info .user-email{font-size: 10px; color: #64748b; font-family: monospace;}
+.user-live-badge{
   font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7;
   padding: 3px 8px; border-radius: 999px; border: 1px solid #bbf7d0;
   display: inline-flex; align-items: center; gap: 4px;
 }
+.btn-auth-switch{
+  background: transparent; border: 1px solid #e2e8f0; border-radius: 999px;
+  color: #64748b; padding: 3px 8px; font-size: 11px; cursor: pointer; font-family: inherit;
+  transition: all 0.15s; margin-right: 4px;
+}
+.btn-auth-switch:hover{background: #fee2e2; color: #dc2626; border-color: #fca5a5;}
+
 
 /* WhatsApp Alert Cards & Buttons */
 .wa-alert-card{
@@ -511,15 +535,9 @@ table.custom-table tr:hover td{background: #f8fafc;}
         </div>
       </div>
       <div class="header-actions">
-        <!-- Google Account & Live Gemini Status -->
-        <div class="google-user-pill" title="حساب Google المسجل والنشط لتشغيل نموذج Gemini">
-          <div class="google-avatar-wrap">👤</div>
-          <div class="google-user-info">
-            <strong id="userGoogleName">المهندس مينا خيرت</strong>
-            <span id="userGoogleEmail" class="google-email">minakhairat1@gmail.com</span>
-          </div>
-          <span class="google-live-badge">🟢 Gemini متصل بحساب Google</span>
-        </div>
+        <!-- Dynamic User Auth Widget (Per-User Login for Gemini) -->
+        <div id="userAuthContainer" class="auth-widget"></div>
+
 
         <button id="btn-load-demo" class="btn outline small" title="تحميل بيانات مصنع تجريبية لتجربة البرنامج">
           ✨ تجربة بيانات مصنع
@@ -1073,6 +1091,81 @@ table.custom-table tr:hover td{background: #f8fafc;}
   <!-- Audio Alert Beep -->
   <audio id="alertSound" preload="auto"></audio>
 
+  <!-- User Account & Gemini Sign-in Modal -->
+  <div id="userAuthModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box" style="max-width: 520px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px; color:#0f172a;">
+          <span style="font-size:22px;">🔐</span> تسجيل الدخول لتشغيل Gemini
+        </h3>
+        <button id="btnAuthModalClose" class="btn outline small" type="button" style="padding:4px 8px; border-radius:50%;">✕</button>
+      </div>
+
+      <p style="font-size:13px; color:#64748b; line-height:1.6; margin:0 0 16px;">
+        سجّل حسابك الخاص بالمصنع أو حساب Google لربط تشغيل مستشار ومساعد الذكاء الاصطناعي <strong>Gemini 3.8 Flash</strong> بحسابك ولإصدار التقارير والتنبيهات باسمك الشخصي.
+      </p>
+
+      <!-- Google Sign-In Section -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:18px; text-align:center;">
+        <div style="font-size:13px; font-weight:700; color:#334155; margin-bottom:10px;">
+          ⚡ خيار 1: تسجيل الدخول السريع بحساب Google
+        </div>
+        <div id="googleBtnSlot" style="display:flex; justify-content:center; margin-bottom:8px;">
+          <button id="btnQuickGoogleSignIn" type="button" class="btn outline" style="background:#ffffff; border-color:#cbd5e1; gap:10px; font-size:13px; width:100%; max-width:340px;">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.64v3.02h3.88c2.28-2.09 3.66-5.17 3.66-9.1z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.12C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.59H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.41l4.03-3.12z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.59l4.03 3.12c.95-2.83 3.6-4.96 6.72-4.96z"/></svg>
+            تسجيل الدخول الفوري بحساب Google
+          </button>
+        </div>
+        <div id="g_id_signin_rendered" style="display:flex; justify-content:center; margin-top:6px;"></div>
+        <span style="font-size:11px; color:#94a3b8;">يربط جلسة العمل الحالية بحسابك المسجل</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+        <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+        <span style="font-size:12px; color:#64748b; font-weight:700;">أو تسجيل بياناتك وبيانات الوردية يدوياً</span>
+        <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+      </div>
+
+      <!-- Manual User Form -->
+      <form id="formUserAuth">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="authUserName">الاسم واللقب المهني <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="authUserName" placeholder="مثال: م. أحمد مصطفى أو اسمك" required />
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="authUserEmail">البريد الإلكتروني <span style="color:#ef4444;">*</span></label>
+          <input type="email" id="authUserEmail" placeholder="your.name@example.com أو حساب Google" required />
+        </div>
+
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label for="authUserRole">الدور / التخصص بالمصنع</label>
+            <select id="authUserRole">
+              <option value="مهندس إنتاج">مهندس إنتاج</option>
+              <option value="مهندس صيانة وجودة">مهندس صيانة وجودة</option>
+              <option value="مشرف إدارة السوبرماركت">مشرف إدارة السوبرماركت</option>
+              <option value="مسؤول عربيات وتداول Just-in-Time">مسؤول عربيات وتداول Just-in-Time</option>
+              <option value="مدير الوردية">مدير الوردية</option>
+              <option value="مهندس تخطيط ومتابعة SAP">مهندس تخطيط ومتابعة SAP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="authUserPhone">رقم الموبايل / واتساب (اختياري)</label>
+            <input type="tel" id="authUserPhone" placeholder="01xxxxxxxxx" />
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button id="btnCancelAuth" type="button" class="btn outline small">إلغاء</button>
+          <button id="btnSaveAuth" type="submit" class="btn small" style="background:#0284c7;">
+            حفظ وتفعيل Gemini بالحساب 🚀
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- In-app Dialog Modal (safe inside iframes) -->
   <div id="appModal" class="modal-backdrop" style="display:none;">
     <div class="modal-box">
@@ -1218,6 +1311,216 @@ function playAlertBeep() {
     updateKPIs();
   }
   let state = load();
+
+  // ==========================================
+  // User Authentication & Gemini Per-User Session
+  // ==========================================
+  const AUTH_USER_KEY = 'supermarket_current_user';
+
+  function getCurrentUser() {
+    try {
+      const raw = localStorage.getItem(AUTH_USER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function setCurrentUser(userData) {
+    if (userData) {
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userData));
+    } else {
+      localStorage.removeItem(AUTH_USER_KEY);
+    }
+    renderAuthWidget();
+    // Refresh previews if on alerts tab
+    const previewEl = document.getElementById('linesStatusPreview');
+    if (previewEl && typeof generateLinesStatusReport === 'function') {
+      previewEl.textContent = generateLinesStatusReport();
+    }
+  }
+
+  function renderAuthWidget() {
+    const container = document.getElementById('userAuthContainer');
+    if (!container) return;
+    const user = getCurrentUser();
+
+    if (user && user.name) {
+      const roleLabel = user.role || 'مسؤول السوبرماركت';
+      const emailLabel = user.email || '';
+      const avatarContent = user.avatarUrl
+        ? `<img src="${user.avatarUrl}" alt="${user.name}">`
+        : `👤`;
+
+      container.innerHTML = `
+        <div class="user-logged-pill" title="حسابك المسجل لتشغيل Gemini وإصدار التقارير">
+          <div class="user-avatar-wrap">${avatarContent}</div>
+          <div class="user-text-info">
+            <strong>${user.name}</strong>
+            <span class="user-role-badge">${roleLabel}</span>
+            ${emailLabel ? `<span class="user-email">${emailLabel}</span>` : ''}
+          </div>
+          <span class="user-live-badge">🟢 Gemini متصل</span>
+          <button id="btnAuthSwitch" class="btn-auth-switch" type="button" title="تبديل الحساب أو تعديل بياناتك">تبديل / خروج</button>
+        </div>
+      `;
+
+      document.getElementById('btnAuthSwitch')?.addEventListener('click', () => {
+        showModalDialog({
+          title: 'إدارة حسابك الحالي',
+          message: `المستخدم المسجل حالياً:\nالاسم: ${user.name}\nالبريد: ${user.email || 'غير مسجل'}\nالدور: ${roleLabel}\n\nاختر "موافق" لتعديل بياناتك، أو "إلغاء" لتسجيل الخروج وتبديل الحساب:`,
+          showCancel: true,
+          onOk: () => {
+            openAuthModal(true);
+          },
+          onCancel: () => {
+            setCurrentUser(null);
+            showToast('تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول بحساب جديد.');
+          }
+        });
+        const btnCancel = document.getElementById('modalBtnCancel');
+        const btnOk = document.getElementById('modalBtnOk');
+        if (btnCancel) btnCancel.textContent = '🚪 تسجيل الخروج';
+        if (btnOk) btnOk.textContent = '✏️ تعديل البيانات';
+      });
+    } else {
+      container.innerHTML = `
+        <button id="btnHeaderLogin" class="btn-login-trigger" type="button" title="اضغط لتسجيل حسابك الخاص وتفعيل Gemini">
+          <span>🔑</span>
+          <span>تسجيل الدخول لتشغيل Gemini</span>
+          <span style="font-size:10px; background:rgba(255,255,255,0.22); padding:2px 7px; border-radius:999px;">حسابك الخاص</span>
+        </button>
+      `;
+
+      document.getElementById('btnHeaderLogin')?.addEventListener('click', () => {
+        openAuthModal(false);
+      });
+    }
+  }
+
+  const authModal = document.getElementById('userAuthModal');
+  const btnAuthClose = document.getElementById('btnAuthModalClose');
+  const btnCancelAuth = document.getElementById('btnCancelAuth');
+  const formUserAuth = document.getElementById('formUserAuth');
+  const authUserName = document.getElementById('authUserName');
+  const authUserEmail = document.getElementById('authUserEmail');
+  const authUserRole = document.getElementById('authUserRole');
+  const authUserPhone = document.getElementById('authUserPhone');
+  const btnQuickGoogleSignIn = document.getElementById('btnQuickGoogleSignIn');
+
+  function openAuthModal(isEditing = false) {
+    if (!authModal) return;
+    const user = getCurrentUser();
+    if (user && isEditing) {
+      if (authUserName) authUserName.value = user.name || '';
+      if (authUserEmail) authUserEmail.value = user.email || '';
+      if (authUserRole && user.role) authUserRole.value = user.role;
+      if (authUserPhone) authUserPhone.value = user.phone || '';
+    }
+    authModal.style.display = 'flex';
+    if (authUserName) setTimeout(() => authUserName.focus(), 80);
+  }
+
+  function closeAuthModal() {
+    if (authModal) authModal.style.display = 'none';
+  }
+
+  btnAuthClose?.addEventListener('click', closeAuthModal);
+  btnCancelAuth?.addEventListener('click', closeAuthModal);
+
+  formUserAuth?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = authUserName.value.trim();
+    const email = authUserEmail.value.trim();
+    const role = authUserRole.value;
+    const phone = authUserPhone.value.trim();
+    if (!name || !email) {
+      showToast('يرجى إدخال اسمك وبريدك الإلكتروني.');
+      return;
+    }
+    setCurrentUser({
+      name,
+      email,
+      role,
+      phone,
+      isGoogle: false,
+      loginAt: new Date().toISOString()
+    });
+    closeAuthModal();
+    showToast(`✨ مرحباً بك يا ${name}! تم تفعيل Gemini بحسابك الشخصي بنجاح.`);
+  });
+
+  btnQuickGoogleSignIn?.addEventListener('click', () => {
+    showModalDialog({
+      title: 'تسجيل الدخول الفوري بحساب Google',
+      message: 'أدخل عنوان بريدك الإلكتروني (Gmail) لربطه بنموذج Gemini وجلسة العمل الحالية:',
+      showInput: true,
+      defaultValue: authUserEmail?.value || '',
+      showCancel: true,
+      onOk: (enteredEmail) => {
+        if (!enteredEmail || !enteredEmail.trim()) {
+          showToast('تم إلغاء التسجيل.');
+          return;
+        }
+        const email = enteredEmail.trim();
+        let derivedName = email.split('@')[0].replace(/[._-]/g, ' ');
+        derivedName = derivedName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+        showModalDialog({
+          title: 'اسم المهندس / المشرف',
+          message: 'أدخل اسمك الكريم الذي سيظهر في التقارير والتنبيهات الموجهة للخطوط:',
+          showInput: true,
+          defaultValue: authUserName?.value || `م. ${derivedName}`,
+          showCancel: false,
+          onOk: (nameEntered) => {
+            const finalName = nameEntered && nameEntered.trim() ? nameEntered.trim() : `م. ${derivedName}`;
+            setCurrentUser({
+              name: finalName,
+              email: email,
+              role: authUserRole?.value || 'مهندس إنتاج',
+              phone: authUserPhone?.value || '',
+              isGoogle: true,
+              loginAt: new Date().toISOString()
+            });
+            closeAuthModal();
+            showToast(`🟢 تم تسجيل الدخول بنجاح بحساب Google (${email}) وتفعيل Gemini!`);
+          }
+        });
+      }
+    });
+  });
+
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  window.handleGoogleCredentialResponse = function(response) {
+    try {
+      const payload = parseJwt(response.credential);
+      if (payload) {
+        setCurrentUser({
+          name: payload.name || payload.given_name || 'مهندس مصنع',
+          email: payload.email,
+          avatarUrl: payload.picture,
+          role: 'مهندس إنتاج',
+          isGoogle: true,
+          loginAt: new Date().toISOString()
+        });
+        closeAuthModal();
+        showToast(`🟢 تم تسجيل الدخول بحساب Google: ${payload.name}`);
+      }
+    } catch(err) {
+      console.warn('GSI parse note:', err);
+    }
+  };
+
 
   // DOM elements
   const tabs = document.querySelectorAll('.nav .tab');
@@ -1624,6 +1927,7 @@ function playAlertBeep() {
 
   // ---------- RENDERING ----------
   function renderAll(){
+    renderAuthWidget();
     updateKPIs();
     renderBomList();
     renderCompDatalist();
@@ -2093,21 +2397,31 @@ function playAlertBeep() {
     });
 
     const urgentAlertsCount = activeAlertsList.filter(a => a.type === 'danger').length;
+    const curUser = getCurrentUser();
+    const supervisorLine = curUser
+      ? `👷‍♂️ *المشرف الحالي:* ${curUser.name} (${curUser.role || 'مسؤول السوبرماركت'})${curUser.phone ? ' - ' + curUser.phone : ''}`
+      : `👷‍♂️ *المشرف الحالي:* مسؤول وردية السوبرماركت`;
 
     return `🏭 *تقرير الموقف التشغيلي لخطوط الإنتاج - SuperMarketPro*
 🗓️ *التاريخ:* ${dateStr} - ${timeStr}
-👷‍♂️ *إشراف المهندس:* مينا خيرت (01200224513)
+${supervisorLine}
 ━━━━━━━━━━━━━━━━━━━
 ${linesDetails}━━━━━━━━━━━━━━━━━━━
 🚨 *التنبيهات العاجلة:* ${urgentAlertsCount} تنبيه حرج
 📦 *إجمالي أكواد SAP المدارة:* ${Object.keys(state.stock).length} صنف
 🛒 *إجمالي عربيات التداول:* ${state.carts.length} عربية
 
-⚠️ *توجيهات السوبرماركت:* يرجى الالتزام بمواعيد التعبئة المحددة قبل 15 دقيقة بنظام Just-in-Time.`;
+⚠️ *توجيهات السوبرماركت:* يرجى الالتزام بمواعيد التعبئة المحددة قبل 15 دقيقة بنظام Just-in-Time.
+⚙️ *نظام SuperMarketPro • حقوق الملكية للمهندس مينا خيرت (01200224513)*`;
   }
 
   function formatSingleAlertWhatsApp(alertObj) {
     const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    const curUser = getCurrentUser();
+    const senderLine = curUser
+      ? `👷‍♂️ *المرسل:* ${curUser.name} (${curUser.role || 'مسؤول السوبرماركت'})${curUser.phone ? ' - ' + curUser.phone : ''}`
+      : `👷‍♂️ *المرسل:* إدارة السوبرماركت الصناعي`;
+
     return `🚨 *تنبيه تشغيلي عاجل - SuperMarketPro*
 ━━━━━━━━━━━━━━━━━━━
 📍 *الخط المستهدف:* ${alertObj.line || 'خطوط الإنتاج'}
@@ -2116,8 +2430,9 @@ ${linesDetails}━━━━━━━━━━━━━━━━━━━
 ⏱️ *تفاصيل التنبيه:* ${alertObj.text}
 ━━━━━━━━━━━━━━━━━━━
 ⚠️ *الإجراء الفوري المطلوب:* ${alertObj.action || 'التعبئة والنقل الفوري إلى صالة الإنتاج'}
-👷‍♂️ *المرسل:* م. مينا خيرت (01200224513)
-⏰ *التوقيت:* ${timeStr}`;
+${senderLine}
+⏰ *التوقيت:* ${timeStr}
+⚙️ *SuperMarketPro • م. مينا خيرت (01200224513)*`;
   }
 
   function checkAlerts(){
@@ -2337,13 +2652,19 @@ ${linesDetails}━━━━━━━━━━━━━━━━━━━
       if (!msg) return;
 
       const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const curUser = getCurrentUser();
+      const senderText = curUser
+        ? `👷‍♂️ *المرسل المسؤول:* ${curUser.name} (${curUser.role || 'مسؤول السوبرماركت'})${curUser.phone ? ' - ' + curUser.phone : ''}`
+        : `👷‍♂️ *المرسل:* إدارة السوبرماركت الصناعي`;
+
       const fullDispatchText = `📢 *توجيه تشغيلي عاجل - SuperMarketPro*
 ━━━━━━━━━━━━━━━━━━━
 🎯 *الجهة / الخط:* ${line}
 📝 *التوجيه:* ${msg}
 ━━━━━━━━━━━━━━━━━━━
-👷‍♂️ *المرسل:* م. مينا خيرت (01200224513)
-⏰ *التوقيت:* ${timeStr}`;
+${senderText}
+⏰ *التوقيت:* ${timeStr}
+⚙️ *نظام SuperMarketPro • م. مينا خيرت (01200224513)*`;
 
       openWhatsApp(fullDispatchText, recPhone);
       showToast('تم فتح واتساب لإرسال التوجيه.');
@@ -2566,15 +2887,22 @@ ${linesDetails}━━━━━━━━━━━━━━━━━━━
   }
 
   btnRunAdvisor.addEventListener('click', async () => {
+    const user = getCurrentUser();
+    if (!user) {
+      showToast('⚠️ يرجى تسجيل الدخول بحسابك أولاً لتشغيل نموذج Gemini.');
+      openAuthModal();
+      return;
+    }
+
     btnRunAdvisor.disabled = true;
     btnRunAdvisor.innerHTML = '⏳ جاري استشارة الذكاء الاصطناعي...';
-    advisorContainer.innerHTML = '<div style="text-align:center; padding:30px;"><div style="font-size:24px;">🧠</div><p>جاري تحليل مخزون الـ SAP وعربيات التداول وخطوط الإنتاج...</p></div>';
+    advisorContainer.innerHTML = '<div style="text-align:center; padding:30px;"><div style="font-size:24px;">🧠</div><p>جاري تحليل مخزون الـ SAP وعربيات التداول وخطوط الإنتاج لـ ' + user.name + '...</p></div>';
 
     try {
       const res = await fetch('/api/ai/advisor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
+        body: JSON.stringify({ ...state, currentUser: user })
       });
       if (!res.ok) throw new Error('استجابة غير متاحة من السيرفر');
       const data = await res.json();
@@ -2660,10 +2988,11 @@ ${linesDetails}━━━━━━━━━━━━━━━━━━━
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
+      const curUser = getCurrentUser();
       const res = await fetch('/api/ai/chat-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: query, factoryState: state })
+        body: JSON.stringify({ question: query, factoryState: state, currentUser: curUser })
       });
       if (!res.ok) throw new Error('Offline fallback');
       const data = await res.json();
@@ -2673,8 +3002,10 @@ ${linesDetails}━━━━━━━━━━━━━━━━━━━
         throw new Error('Local fallback');
       }
     } catch(err){
+      const curUser = getCurrentUser();
       const localReply = computeLocalChatReply(query, state);
-      botLoading.innerHTML = localReply.replace(/\n/g, '<br>');
+      const prefix = curUser ? `<strong>مرحباً بك يا ${curUser.name}:</strong><br>` : '';
+      botLoading.innerHTML = prefix + localReply.replace(/\n/g, '<br>');
     }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }

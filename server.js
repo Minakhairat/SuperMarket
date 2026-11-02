@@ -30,13 +30,10 @@ if (process.env.GEMINI_API_KEY) {
   }
 }
 
-// Endpoint to verify Google and Gemini status
+// Endpoint to verify Gemini status
 app.get('/api/user-status', (req, res) => {
   res.json({
-    googleAccountLinked: true,
-    userEmail: 'minakhairat1@gmail.com',
-    userName: 'المهندس مينا خيرت',
-    geminiLive: true,
+    geminiLive: !!process.env.GEMINI_API_KEY,
     geminiModel: 'gemini-3.8-flash',
   });
 });
@@ -257,7 +254,9 @@ function generateLocalChatReply(question = '', factoryState = {}) {
 
 // Endpoint 1: Factory Supermarket AI Advisor
 app.post('/api/ai/advisor', async (req, res) => {
-  const { stock, carts, boms, productions } = req.body || {};
+  const { stock, carts, boms, productions, currentUser } = req.body || {};
+  const currentUserName = currentUser?.name || 'المهندس المسؤول';
+  const currentUserRole = currentUser?.role || 'مسؤول السوبرماركت';
 
   // If Gemini API is available and configured, use Gemini 3.8 Flash
   if (ai && process.env.GEMINI_API_KEY) {
@@ -283,7 +282,8 @@ app.post('/api/ai/advisor', async (req, res) => {
         recentOrders: (productions || []).slice(-5),
       };
 
-      const prompt = `أنت مهندس خبير في سلاسل الإمداد وإدارة السوبرماركت الصناعي وتغذية خطوط الإنتاج الخمسة (خط 1 إلى خط 5) بنظام Just-in-Time و SAP.
+      const prompt = `أنت مهندس خبير ومستشار ذكي في سلاسل الإمداد وإدارة السوبرماركت الصناعي وتغذية خطوط الإنتاج الخمسة (خط 1 إلى خط 5) بنظام Just-in-Time و SAP.
+أنت تقدم تقريرك للمستخدم الحالي المسجل: "${currentUserName}" (${currentUserRole}).
 قم بتحليل بيانات السوبرماركت الحالية للمصنع وقدم تقريراً استشارياً دقيقاً باللغة العربية:
 بيانات المصنع:
 ${JSON.stringify(factoryDataSummary, null, 2)}
@@ -291,7 +291,7 @@ ${JSON.stringify(factoryDataSummary, null, 2)}
 المطلوب إخراج النتيجة بتنسيق JSON حصراً بالشكل التالي:
 {
   "status": "مستقر" أو "تحذيري" أو "حرج" أو "ممتاز",
-  "summary": "ملخص تنفيذي للموقف الحالي بأسلوب احترافي للمهندس المسؤول",
+  "summary": "ملخص تنفيذي للموقف الحالي موجه لـ ${currentUserName}",
   "bottlenecks": [
     {
       "sap": "كود الساب",
@@ -387,21 +387,25 @@ app.post('/api/ai/parse-bom', async (req, res) => {
 
 // Endpoint 3: Interactive Supermarket Q&A
 app.post('/api/ai/chat-assistant', async (req, res) => {
-  const { question, factoryState } = req.body || {};
+  const { question, factoryState, currentUser } = req.body || {};
   if (!question || !question.trim()) {
     return res.status(400).json({ success: false, error: 'السؤال مطلوب.' });
   }
 
+  const currentUserName = currentUser?.name || 'المستخدم';
+  const currentUserRole = currentUser?.role || 'مسؤول السوبرماركت';
+
   if (ai && process.env.GEMINI_API_KEY) {
     try {
-      const prompt = `أنت "المساعد الذكي لنظام SuperMarketPro"، مهندس ومستشار تشغيل السوبرماركت الصناعي بالمصنع للمهندس مينا خيرت.
+      const prompt = `أنت "المساعد الذكي لنظام SuperMarketPro"، مهندس ومستشار تشغيل السوبرماركت الصناعي بالمصنع.
+أنت تتحدث مع المستخدم الحالي المسجل: "${currentUserName}" ومهنته/دوره: (${currentUserRole}).
 البيانات الحية للمصنع حالياً:
 ${JSON.stringify(factoryState || {}, null, 2)}
 
-سؤال المهندس:
+سؤال المستخدم:
 "${question}"
 
-أجب باللغة العربية بدقة هندسية عملية وموجزة. وجه إجابتك للأرقام الحقيقية في المخزون وحالة عربيات التداول والخطوط (خط 1 إلى 5).`;
+أجب باللغة العربية بدقة هندسية عملية وموجزة وخاطب المستخدم باسمه إن كان مناسباً. وجه إجابتك للأرقام الحقيقية في المخزون وحالة عربيات التداول والخطوط (خط 1 إلى 5).`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-3.8-flash',
@@ -416,7 +420,7 @@ ${JSON.stringify(factoryState || {}, null, 2)}
 
   // Fallback to local industrial Q&A
   const reply = generateLocalChatReply(question, factoryState);
-  return res.json({ success: true, reply, engine: 'industrial-advisor' });
+  return res.json({ success: true, reply: `مرحباً بك يا ${currentUserName}.\n` + reply, engine: 'industrial-advisor' });
 });
 
 // Serve frontend
