@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>نظام السوبرماركت قبل خط الإنتاج — SuperMarketPro</title>
+  <meta name="description" content="نظام السوبرماركت قبل خط الإنتاج (SAP codes، 5 خطوط إنتاج، وتنبيهات ومخزون وعربيات التداول)" />
+  <meta property="og:title" content="SuperMarketPro" />
+  <meta property="og:description" content="نظام السوبرماركت قبل خط الإنتاج (SAP codes، 5 خطوط إنتاج، وتنبيهات ومخزون وعربيات التداول)" />
+  <style>
+:root{
+  --bg:#f3f6fb;
+  --card:#ffffff;
+  --accent:#0366d6;
+  --muted:#6b7280;
+  --danger:#e53935;
+  --success:#16a34a;
+  --radius:12px;
+  --gap:12px;
+  font-family:"Segoe UI", Tahoma, system-ui, "Noto Kufi Arabic", "Noto Sans", sans-serif;
+}
+
+/* reset & base */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background: linear-gradient(180deg,#eef6ff 0%,var(--bg) 100%);
+  color:#0f172a;padding:16px;
+  -webkit-font-smoothing:antialiased;
+}
+.app{max-width:1200px;margin:0 auto}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.brand .logo{font-size:36px}
+.brand h1{margin:0;font-size:20px}
+.brand p{margin:0;color:var(--muted);font-size:13px}
+.top-actions button{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:6px 10px;border-radius:8px;cursor:pointer}
+
+/* nav */
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.nav .tab{background:var(--card);border:0;padding:8px 12px;border-radius:999px;cursor:pointer;box-shadow:0 8px 30px rgba(2,6,23,0.04)}
+.nav .tab.active{background:linear-gradient(90deg,var(--accent),#1fa7ff);color:white;box-shadow:0 12px 36px rgba(3,102,214,0.18)}
+
+/* panes/cards */
+.main{display:block}
+.pane{display:none}
+.pane.active{display:block}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--gap)}
+@media(max-width:1000px){ .grid{grid-template-columns:1fr} }
+
+.card{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:0 8px 24px rgba(16,24,40,0.06);margin-bottom:12px}
+.card.sub{background:linear-gradient(180deg,#fcfeff,#ffffff);padding:10px}
+
+/* forms */
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row.wrap{flex-wrap:wrap}
+.row > *{flex:1;min-width:160px}
+label{display:block;direction:rtl}
+input,select,textarea,button{padding:10px;border-radius:10px;border:1px solid #eef6ff;background:#fbfdff;font-size:15px}
+input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3,102,214,0.08);border-color:var(--accent)}
+.btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-size:15px}
+.btn.small{padding:6px 8px;font-size:13px}
+.btn.outline{background:transparent;border:1px solid rgba(3,102,214,0.12);color:var(--accent)}
+
+/* lists & tables */
+.list{list-style:none;padding:0;margin:0}
+.list li{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px dashed rgba(3,102,214,0.05);margin-bottom:8px}
+.table{width:100%;border-collapse:collapse}
+.table thead th{background:#f8fafc;padding:8px;border-bottom:1px solid #eef3ff;text-align:right}
+.table tbody td{padding:8px;border-bottom:1px solid #f5f7fb}
+.table-wrap{overflow:auto;max-height:420px;padding-right:6px}
+
+/* small screens adjustments */
+@media(max-width:720px){
+  body{padding:12px}
+  .brand h1{font-size:16px}
+  .nav .tab{padding:10px;border-radius:14px}
+  input,select,textarea,button{font-size:16px;padding:12px}
+  .row > *{min-width:120px}
+  .list li{flex-direction:column;align-items:flex-start;gap:6px}
+  .table thead th, .table tbody td{font-size:14px;padding:10px}
+}
+
+/* mobile stacked tables */
+@media(max-width:480px){
+  .row > *{min-width:100%}
+  .table, thead, tbody, th, td, tr { display:block; width:100%; }
+  .table thead{display:none}
+  .table tbody tr{margin-bottom:10px;border-radius:8px;padding:10px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+  .table tbody td{padding:6px 0;text-align:right;border-bottom:0}
+  .table tbody td::before{content:attr(data-label);float:left;font-weight:700}
+}
+
+/* alerts */
+.muted{color:var(--muted);font-size:13px}
+.alert{background:var(--danger);color:white;padding:8px;border-radius:8px;margin-bottom:8px;animation: blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.flash{animation:intenseFlash 1s infinite}
+@keyframes intenseFlash{0%{box-shadow:0 0 0 0 rgba(229,57,53,0)}50%{box-shadow:0 0 40px 8px rgba(229,57,53,0.18)}100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}}
+
+/* RTL tweaks */
+input,select,textarea{direction:ltr}
+.footer{margin-top:12px;text-align:center;color:var(--muted)}
+
+/* Modals & Toasts for iframe-safe alerts */
+.modal-backdrop{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(15,23,42,0.5);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;backdrop-filter:blur(3px);
+}
+.modal-box{
+  background:var(--card);
+  padding:20px;border-radius:var(--radius);
+  max-width:440px;width:90%;
+  box-shadow:0 20px 40px rgba(0,0,0,0.18);
+  direction:rtl;
+}
+.toast-container{
+  position:fixed;bottom:20px;left:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;max-width:380px;pointer-events:none;
+}
+.toast{
+  background:#1e293b;color:#f8fafc;padding:12px 16px;border-radius:10px;font-size:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);animation:toastIn 0.25s ease;direction:rtl;pointer-events:auto;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">🏭</div>
+        <div>
+          <h1>نظام السوبرماركت قبل خط الإنتاج</h1>
+          <p class="muted">SAP codes • 5 خطوط إنتاج • تنبيهات قبل 15 دقيقة • تخزين محلي</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="btn-reset" class="btn outline small" title="مسح كل البيانات">مسح البيانات</button>
+      </div>
+    </header>
+
+    <nav class="nav" role="navigation" aria-label="التنقل">
+      <button class="tab active" data-tab="dashboard">لوحة التحكم</button>
+      <button class="tab" data-tab="bom">BOM</button>
+      <button class="tab" data-tab="stock">استلام المخزن</button>
+      <button class="tab" data-tab="carts">عربيات التداول</button>
+      <button class="tab" data-tab="production">أوامر الإنتاج</button>
+      <button class="tab" data-tab="reports">التقارير</button>
+    </nav>
+
+    <main class="main">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="pane active">
+        <h2>لوحة التحكم</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>مخطط المخزون حسب الخط</h3>
+            <canvas id="stockChart" height="140"></canvas>
+            <small class="muted">إجمالي الوحدات لكل خط</small>
+          </div>
+
+          <div class="card">
+            <h3>تنبيهات</h3>
+            <div id="alerts" class="alerts"></div>
+            <div class="center" style="margin-top:12px;">
+              <button id="btn-check-alerts" class="btn">تحقق الآن</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>خطة تحميل مقترحة</h3>
+            <div id="loadPlan"></div>
+            <div class="center" style="margin-top:12px;">
+              <button id="btn-generate-plan" class="btn">اقترح تحميل الآن</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOM -->
+      <section id="bom" class="pane">
+        <h2>BOM — إدارة المنتجات والمكونات</h2>
+        <div class="card">
+          <form id="form-bom">
+            <div class="row wrap">
+              <label class="flex">اسم المنتج
+                <input id="bomName" required placeholder="مثال: مبرد هواء A">
+              </label>
+              <label class="flex">الخطوط الممكنة (اختياري)
+                <select id="bomLines" multiple>
+                  <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="card sub">
+              <h4>مكونات المنتج (مرتبطة بـ SAP)</h4>
+              <div class="row wrap">
+                <input id="compName" placeholder="اسم المكون">
+                <input id="compSAP" placeholder="كود SAP (مفتاح)">
+                <input id="compQtyPerProd" type="number" min="0.0001" step="0.0001" placeholder="كمية لكل منتج">
+                <button id="btn-add-comp" type="button" class="btn small">أضف مكون</button>
+              </div>
+              <ul id="bomCompList" class="list"></ul>
+            </div>
+
+            <div class="row wrap">
+              <button class="btn" type="submit">حفظ الـ BOM</button>
+              <button id="btn-clear-bom" class="btn outline" type="button">مسح الحقول</button>
+            </div>
+            <div class="row wrap" style="margin-top:8px;">
+              <input id="bomExcel" type="file" accept=".xlsx,.xls" />
+              <button id="btn-import-bom" class="btn outline" type="button">استيراد مكونات من Excel</button>
+              <button id="btn-export-bom" class="btn" type="button">تصدير مكونات الـBOM</button>
+              <button id="btn-template-bom" class="btn outline" type="button">تحميل قالب Excel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>قوائم الـ BOM</h3>
+          <ul id="bomList" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- STOCK -->
+      <section id="stock" class="pane">
+        <h2>استلام المخزن (بـ كود SAP)</h2>
+        <div class="card">
+          <form id="form-stock">
+            <div class="row wrap">
+              <label class="flex">كود SAP (إجباري)
+                <input id="stockSAP" list="sapDatalist" placeholder="اكتب أو اختر كود SAP" required>
+                <datalist id="sapDatalist"></datalist>
+              </label>
+              <label class="flex">اسم المكون (ظاهر تلقائياً)
+                <input id="stockName" readonly placeholder="سيظهر بعد اختيار SAP">
+              </label>
+            </div>
+
+            <div class="row wrap">
+              <label class="flex">الكمية الواردة (وحدات)
+                <input id="stockQty" type="number" min="0.0001" step="0.0001" required>
+              </label>
+              <label class="flex">الخط المُستلم إليه
+                <select id="stockLine" required>
+                  <option value="">اختر الخط</option>
+                  <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row wrap">
+              <label class="flex">وقت الاستلام (تاريخ ووقت)
+                <input id="stockDatetime" type="datetime-local" required>
+              </label>
+              <button class="btn" type="submit">سجل وصول</button>
+            </div>
+            <div class="row wrap" style="margin-top:8px;">
+              <input id="stockExcel" type="file" accept=".xlsx,.xls" />
+              <select id="stockImportLine">
+                <option value="خط 1">خط 1</option>
+                <option value="خط 2">خط 2</option>
+                <option value="خط 3">خط 3</option>
+                <option value="خط 4">خط 4</option>
+                <option value="خط 5">خط 5</option>
+              </select>
+              <input id="stockImportDatetime" type="datetime-local" />
+              <button id="btn-import-stock" class="btn outline" type="button">استيراد مخزون من Excel</button>
+              <button id="btn-template-stock" class="btn outline" type="button">تحميل قالب Excel للمخزون</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>قائمة المخزون (تفصيل حسب الخط)</h3>
+          <div class="table-wrap">
+            <table class="table" id="stockTable">
+              <thead>
+                <tr><th>كود SAP</th><th>الاسم</th><th>الكمية الكلية</th><th>تفصيل الخطوط</th><th>إجراءات</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARTS -->
+      <section id="carts" class="pane">
+        <h2>عربيات التداول</h2>
+        <div class="card">
+          <form id="form-cart">
+            <div class="row wrap">
+              <input id="cartName" placeholder="اسم العربية (مثال: عربية 1)" required>
+              <select id="cartSAP" required></select>
+            </div>
+
+            <div class="row wrap">
+              <input id="cartQty" type="number" min="1" step="1" placeholder="الكمية التي تشيلها" required>
+              <input id="cartCoverage" type="number" min="1" step="1" placeholder="مدة التغطية بالساعات" required>
+            </div>
+
+            <div class="row wrap">
+              <select id="cartLine" required>
+                <option value="">اختر الخط</option>
+                <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
+              </select>
+              <button class="btn" type="submit">أضف / حدّث العربية</button>
+            </div>
+            <div class="row wrap" style="margin-top:8px;">
+              <input id="cartsExcel" type="file" accept=".xlsx,.xls" />
+              <button id="btn-import-carts" class="btn outline" type="button">استيراد عربيات من Excel</button>
+              <button id="btn-template-carts" class="btn outline" type="button">تحميل قالب Excel للعربيات</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>قائمة العربيات</h3>
+          <ul id="cartList" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- PRODUCTION -->
+      <section id="production" class="pane">
+        <h2>أوامر الإنتاج</h2>
+        <div class="card">
+          <form id="form-production">
+            <div class="row wrap">
+              <label class="flex">اختر المنتج (BOM)
+                <select id="prodBom" required></select>
+              </label>
+              <label class="flex">كمية الإنتاج
+                <input id="prodQty" type="number" min="1" step="1" required>
+              </label>
+            </div>
+
+            <div class="row wrap">
+              <label class="flex">خط الإنتاج (من الـ BOM)
+                <input id="prodLine" readonly>
+              </label>
+              <label class="flex">وقت الإنتاج (تاريخ ووقت)
+                <input id="prodDatetime" type="datetime-local" required>
+              </label>
+            </div>
+
+            <div class="row wrap">
+              <button class="btn" type="submit">سجل / حدّث أمر الإنتاج</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>سجل أوامر الإنتاج</h3>
+          <ul id="prodList" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="reports" class="pane">
+        <h2>التقارير</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>حالة المخزون التفصيلية</h3>
+            <div class="table-wrap">
+              <table class="table" id="detailedStock">
+                <thead><tr><th>كود SAP</th><th>الاسم</th><th>الخط</th><th>الكمية</th><th>سجل</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>سجل العربيات ووقت التغطية</h3>
+            <ul id="detailedCarts" class="list"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small class="muted">التخزين محلي: localStorage — المفتاح: factory_supermarket_v3</small>
+    </footer>
+  </div>
+
+  <audio id="alertSound" preload="auto"></audio>
+
+  <!-- In-app Dialog Modal (safe inside iframes) -->
+  <div id="appModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box">
+      <h3 id="modalTitle">إشعار</h3>
+      <p id="modalMessage" style="white-space:pre-wrap;margin:12px 0;color:#334155;line-height:1.6;"></p>
+      <div id="modalInputWrap" style="display:none;margin-bottom:12px;">
+        <input id="modalInputVal" style="width:100%;box-sizing:border-box;" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button id="modalBtnCancel" class="btn outline small" type="button" style="display:none;">إلغاء</button>
+        <button id="modalBtnOk" class="btn small" type="button">موافق</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+// Modal / Toast system for iframe safety
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  if(!container) return;
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => t.remove(), 300);
+  }, 4000);
+}
+
+function showModalDialog({ title = 'تنبيه', message, showInput = false, defaultValue = '', showCancel = false, onOk, onCancel }) {
+  const modal = document.getElementById('appModal');
+  const titleEl = document.getElementById('modalTitle');
+  const msgEl = document.getElementById('modalMessage');
+  const inputWrap = document.getElementById('modalInputWrap');
+  const inputEl = document.getElementById('modalInputVal');
+  const btnCancel = document.getElementById('modalBtnCancel');
+  const btnOk = document.getElementById('modalBtnOk');
+
+  titleEl.textContent = title;
+  msgEl.textContent = message || '';
+
+  if (showInput) {
+    inputWrap.style.display = 'block';
+    inputEl.value = defaultValue;
+    setTimeout(() => { inputEl.focus(); inputEl.select(); }, 50);
+  } else {
+    inputWrap.style.display = 'none';
+  }
+
+  btnCancel.style.display = showCancel ? 'inline-block' : 'none';
+  modal.style.display = 'flex';
+
+  const close = () => {
+    modal.style.display = 'none';
+    btnOk.onclick = null;
+    btnCancel.onclick = null;
+  };
+
+  btnOk.onclick = () => {
+    const val = showInput ? inputEl.value : true;
+    close();
+    if(onOk) onOk(val);
+  };
+
+  btnCancel.onclick = () => {
+    close();
+    if(onCancel) onCancel();
+  };
+}
+
+// Override window.alert to show in-app toasts/modals safely
+window.alert = function(msg) {
+  showToast(String(msg));
+};
+
+// Safe audio synthesizer
+function playAlertBeep() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.35);
+  } catch(e) {}
+}
+
+(() => {
+  const STORAGE_KEY = "factory_supermarket_v3";
+  const uid = (p='id') => p + '_' + Math.random().toString(36).slice(2,9);
+  const nowISO = ()=> new Date().toISOString();
+  const toLocalDateTime = iso => {
+    if(!iso) return '';
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  // load/save
+  function load(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { boms:[], stock:{}, carts:[], productions:[] };
+    try{ return JSON.parse(raw); } catch(e){ console.error(e); return { boms:[], stock:{}, carts:[], productions:[] }; }
+  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  let state = load();
+
+  // DOM refs
+  const tabs = document.querySelectorAll('.nav .tab');
+  const panes = document.querySelectorAll('.pane');
+  const alertSound = document.getElementById('alertSound');
+
+  // BOM
+  const formBom = document.getElementById('form-bom');
+  const bomName = document.getElementById('bomName');
+  const bomLines = document.getElementById('bomLines');
+  const compName = document.getElementById('compName');
+  const compSAP = document.getElementById('compSAP');
+  const compQtyPerProd = document.getElementById('compQtyPerProd');
+  const btnAddComp = document.getElementById('btn-add-comp');
+  const bomCompList = document.getElementById('bomCompList');
+  const bomListEl = document.getElementById('bomList');
+  const btnClearBom = document.getElementById('btn-clear-bom');
+
+  // STOCK
+  const formStock = document.getElementById('form-stock');
+  const stockSAP = document.getElementById('stockSAP');
+  const stockName = document.getElementById('stockName');
+  const stockQty = document.getElementById('stockQty');
+  const stockLine = document.getElementById('stockLine');
+  const stockDatetime = document.getElementById('stockDatetime');
+  const sapDatalist = document.getElementById('sapDatalist');
+  const stockTableBody = document.querySelector('#stockTable tbody');
+
+  // CARTS
+  const formCart = document.getElementById('form-cart');
+  const cartName = document.getElementById('cartName');
+  const cartSAP = document.getElementById('cartSAP');
+  const cartQty = document.getElementById('cartQty');
+  const cartCoverage = document.getElementById('cartCoverage');
+  const cartLine = document.getElementById('cartLine');
+  const cartList = document.getElementById('cartList');
+
+  // PRODUCTION
+  const prodBom = document.getElementById('prodBom');
+  const prodQty = document.getElementById('prodQty');
+  const prodDatetime = document.getElementById('prodDatetime');
+  const prodLine = document.getElementById('prodLine');
+  const formProd = document.getElementById('form-production');
+  const prodList = document.getElementById('prodList');
+
+  // REPORTS & UI
+  const detailedStockTbody = document.querySelector('#detailedStock tbody');
+  const detailedCarts = document.getElementById('detailedCarts');
+  const loadPlanBox = document.getElementById('loadPlan');
+  const alertsDiv = document.getElementById('alerts');
+  const ctx = document.getElementById('stockChart').getContext('2d');
+  let stockChart = null;
+
+  // helpers
+  function setDefaultDatetimes(){
+    stockDatetime.value = toLocalDateTime(nowISO());
+    prodDatetime.value = toLocalDateTime(nowISO());
+    const stockImportDt = document.getElementById('stockImportDatetime');
+    if(stockImportDt) stockImportDt.value = toLocalDateTime(nowISO());
+  }
+
+  // NAV setup
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const id = tab.dataset.tab;
+    panes.forEach(p => p.classList.toggle('active', p.id === id));
+    renderAll();
+  }));
+
+  // initial
+  setDefaultDatetimes();
+
+  // ---------- BOM logic ----------
+  let editingBomId = null;
+  let currentComponents = []; // {sap,name,qtyPerProduct}
+
+  btnAddComp.addEventListener('click', () => {
+    const name = compName.value.trim();
+    const sap = compSAP.value.trim();
+    const qty = parseFloat(compQtyPerProd.value);
+    if(!name || !sap || !qty) return alert('املأ اسم المكون، كود SAP، والكمية لكل منتج.');
+    if(currentComponents.some(c=>c.sap===sap)) return alert('هذا SAP مضاف بالفعل في المكونات الحالية.');
+    currentComponents.push({ sap, name, qtyPerProduct: Math.round(qty*1000)/1000 });
+    compName.value = compSAP.value = compQtyPerProd.value = '';
+    renderBomComponents();
+  });
+
+  function renderBomComponents(){
+    bomCompList.innerHTML = '';
+    if(currentComponents.length===0){ bomCompList.innerHTML = '<li class="muted">لا توجد مكونات مضافة.</li>'; return; }
+    currentComponents.forEach((c,i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${c.name}</strong> — SAP: ${c.sap} — لكل منتج: ${c.qtyPerProduct}</div>
+        <div><button class="btn small" data-i="${i}" type="button">حذف</button></div>`;
+      bomCompList.appendChild(li);
+    });
+    bomCompList.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=> { currentComponents.splice(+b.dataset.i,1); renderBomComponents(); });
+    });
+  }
+
+  formBom.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = bomName.value.trim();
+    const lines = Array.from(bomLines.selectedOptions).map(o=>o.value).filter(Boolean);
+    if(!name || currentComponents.length===0) return alert('اكمل اسم المنتج وأضف مكونات.');
+    const rec = { id: editingBomId || uid('bom'), name, lines, components: JSON.parse(JSON.stringify(currentComponents)) };
+    if(editingBomId){ state.boms = state.boms.filter(b=>b.id!==editingBomId); editingBomId = null; }
+    state.boms.push(rec);
+    // ensure stock entries exist for components
+    currentComponents.forEach(c => {
+      if(!state.stock[c.sap]) state.stock[c.sap] = { sap:c.sap, name:c.name, lines:{}, history:[] };
+      state.stock[c.sap].name = c.name;
+    });
+    currentComponents = []; bomName.value=''; Array.from(bomLines.options).forEach(opt=>opt.selected=false);
+    save(); renderAll();
+    alert('تم حفظ الـ BOM بنجاح.');
+  });
+
+  btnClearBom.addEventListener('click', ()=> { bomName.value=''; currentComponents=[]; Array.from(bomLines.options).forEach(opt=>opt.selected=false); renderBomComponents(); });
+
+  // ---------- STOCK logic ----------
+  formStock.addEventListener('submit', e => {
+    e.preventDefault();
+    const sap = stockSAP.value.trim();
+    const name = stockName.value.trim();
+    const qty = parseFloat(stockQty.value);
+    const line = stockLine.value;
+    const when = stockDatetime.value ? new Date(stockDatetime.value).toISOString() : nowISO();
+    if(!sap || !qty || !line) return alert('اكمل كود SAP والكمية والخط.');
+    if(!state.stock[sap]) state.stock[sap] = { sap, name: name||sap, lines:{}, history:[] };
+    state.stock[sap].name = name || state.stock[sap].name;
+    const prev = state.stock[sap].lines[line] || 0;
+    state.stock[sap].lines[line] = Math.round((prev + qty)*1000)/1000;
+    state.stock[sap].history.push({ id: uid('st'), type:'in', qty, when, line, note:'استلام', by:'user' });
+    save(); renderAll(); formStock.reset(); stockName.value=''; setDefaultDatetimes();
+    alert('تم تسجيل استلام الكمية في المخزن.');
+  });
+
+  stockSAP.addEventListener('change', ()=> {
+    const sap = stockSAP.value.trim();
+    if(!sap){ stockName.value=''; return; }
+    if(state.stock[sap]) stockName.value = state.stock[sap].name || '';
+    else {
+      let found = null;
+      for(const b of state.boms){
+        const comp = b.components.find(c=>c.sap===sap);
+        if(comp){ found = comp; break; }
+      }
+      stockName.value = found ? found.name : '';
+    }
+  });
+
+  function editStockLine(sap, line){
+    const s = state.stock[sap];
+    if(!s) return;
+    const prev = s.lines[line] || 0;
+    showModalDialog({
+      title: 'تعديل كمية المخزون',
+      message: `تعديل كمية ${s.name} (${sap}) على ${line}\nالقيمة الحالية: ${prev}\nادخل القيمة الجديدة:`,
+      showInput: true,
+      defaultValue: String(prev),
+      showCancel: true,
+      onOk: (val) => {
+        const newVal = parseFloat(val);
+        if(isNaN(newVal)) return alert('قيمة غير صحيحة.');
+        s.lines[line] = Math.round(newVal*1000)/1000;
+        s.history.push({ id: uid('st'), type:'adjust', qty:newVal, when: new Date().toISOString(), line, note:'تعديل يدوي', by:'user' });
+        save(); renderAll();
+        alert('تم تعديل الكمية بنجاح.');
+      }
+    });
+  }
+
+  // ---------- CART logic ----------
+  let editingCartId = null;
+  formCart.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = cartName.value.trim();
+    const sap = cartSAP.value;
+    const qty = parseInt(cartQty.value);
+    const hours = parseInt(cartCoverage.value);
+    const line = cartLine.value;
+    if(!name || !sap || !qty || !hours || !line) return alert('اكمل بيانات العربية.');
+    if(editingCartId){
+      const c = state.carts.find(x=>x.id===editingCartId);
+      if(!c) return;
+      c.name = name; c.sap = sap; c.qty = qty; c.coverageHours = hours; c.line = line;
+      editingCartId = null;
+      alert('تم تحديث بيانات العربية.');
+    } else {
+      state.carts.push({ id: uid('cart'), name, sap, qty, coverageHours: hours, line, addedAt: null });
+      alert('تمت إضافة العربية بنجاح.');
+    }
+    save(); renderAll(); formCart.reset();
+  });
+
+  function editCart(id){
+    const c = state.carts.find(x=>x.id===id);
+    if(!c) return;
+    editingCartId = id;
+    cartName.value = c.name; cartSAP.value = c.sap; cartQty.value = c.qty; cartCoverage.value = c.coverageHours; cartLine.value = c.line;
+    const cartTab = document.querySelector('.nav .tab[data-tab="carts"]');
+    if(cartTab) cartTab.click();
+  }
+
+  function startCartNow(id){
+    const c = state.carts.find(x=>x.id===id);
+    if(!c) return;
+    c.addedAt = new Date().toISOString();
+    save(); renderAll();
+    alert('تم بدء ساعة التغطية للعربية.');
+  }
+
+  function deleteCart(id){
+    showModalDialog({
+      title: 'تأكيد الحذف',
+      message: 'هل تريد حذف العربية؟',
+      showCancel: true,
+      onOk: () => {
+        state.carts = state.carts.filter(x=>x.id!==id);
+        save(); renderAll();
+        alert('تم حذف العربية.');
+      }
+    });
+  }
+
+  // ---------- PRODUCTION logic ----------
+  let editingProdId = null;
+  prodBom.addEventListener('change', ()=>{
+    const b = state.boms.find(x=>x.id === prodBom.value);
+    prodLine.value = b && b.lines && b.lines.length ? b.lines[0] : '';
+  });
+
+  formProd.addEventListener('submit', e => {
+    e.preventDefault();
+    const bomId = prodBom.value;
+    const qty = parseInt(prodQty.value);
+    const when = prodDatetime.value ? new Date(prodDatetime.value).toISOString() : nowISO();
+    const bom = state.boms.find(b=>b.id===bomId);
+    if(!bom || !qty) return alert('اختر المنتج وادخل كمية صحيحة.');
+    const consumed = bom.components.map(c=>({ sap: c.sap, name: c.name, qty: Math.round(c.qtyPerProduct * qty * 1000)/1000 }));
+    
+    const executeProdSave = () => {
+      if(editingProdId){
+        const rec = state.productions.find(p=>p.id===editingProdId);
+        if(!rec) return;
+        rec.bomId = bom.id; rec.bomName = bom.name; rec.qty = qty; rec.when = when; rec.line = bom.lines && bom.lines[0] ? bom.lines[0] : ''; rec.consumed = consumed;
+        editingProdId = null;
+      } else {
+        consumed.forEach(c => {
+          const s = state.stock[c.sap] || { sap:c.sap, name:c.name, lines:{}, history:[] };
+          if(!state.stock[c.sap]) state.stock[c.sap] = s;
+          let left = c.qty;
+          const pref = bom.lines && bom.lines.length ? bom.lines.concat(Object.keys(s.lines||{})).filter((v,i,arr)=>arr.indexOf(v)===i) : Object.keys(s.lines||{});
+          pref.forEach(ln => {
+            if(left <= 0) return;
+            const avail = s.lines[ln] || 0;
+            const take = Math.min(avail, left);
+            s.lines[ln] = Math.round((avail - take)*1000)/1000;
+            if(take > 0) s.history.push({ id: uid('st'), type:'out', qty: take, when, line: ln, note:'استهلاك إنتاج', by:'system' });
+            left = Math.round((left - take)*1000)/1000;
+          });
+          if(left > 0){
+            const fallback = (bom.lines && bom.lines[0]) || Object.keys(s.lines||{})[0] || 'خط 1';
+            s.lines[fallback] = Math.round(((s.lines[fallback]||0) - left)*1000)/1000;
+            s.history.push({ id: uid('st'), type:'out', qty: left, when, line: fallback, note:'استهلاك إنتاج (نقص)', by:'system' });
+          }
+        });
+        const rec = { id: uid('prod'), bomId: bom.id, bomName: bom.name, qty, when, line: bom.lines && bom.lines[0] ? bom.lines[0] : '', consumed };
+        state.productions.push(rec);
+      }
+      save(); renderAll(); formProd.reset(); setDefaultDatetimes();
+      alert('تم تسجيل أمر الإنتاج بنجاح.');
+    };
+
+    if(editingProdId){
+      showModalDialog({
+        title: 'تنبيه التعديل',
+        message: 'تعديل أمر الإنتاج لن يعكس تلقائياً تغيير المخزون. متابعة؟',
+        showCancel: true,
+        onOk: executeProdSave
+      });
+    } else {
+      executeProdSave();
+    }
+  });
+
+  function editProduction(id){
+    const p = state.productions.find(x=>x.id===id);
+    if(!p) return;
+    showModalDialog({
+      title: 'تعديل أمر الإنتاج',
+      message: 'ستُحمّل بيانات الأمر في النموذج للتعديل. ملاحظة: النظام لن يعكس المخزون تلقائياً. متابعة؟',
+      showCancel: true,
+      onOk: () => {
+        editingProdId = id;
+        prodBom.value = p.bomId; prodQty.value = p.qty; prodDatetime.value = toLocalDateTime(p.when); prodLine.value = p.line;
+        const prodTab = document.querySelector('.nav .tab[data-tab="production"]');
+        if(prodTab) prodTab.click();
+      }
+    });
+  }
+
+  // ---------- Rendering ----------
+  function renderAll(){
+    renderBomList();
+    renderCompDatalist();
+    renderStockTable();
+    renderCartList();
+    renderProdList();
+    renderReports();
+    renderChart();
+    renderLoadPlanUI(generateLoadPlan());
+    checkAlerts();
+  }
+
+  function renderBomList(){
+    bomListEl.innerHTML = '';
+    if(state.boms.length === 0){ bomListEl.innerHTML = '<li class="muted">لا توجد قوائم BOM.</li>'; return; }
+    state.boms.forEach(b=>{
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${b.name}</strong><div class="muted">${(b.lines||[]).join(' • ')}</div>
+        <div class="muted">${(b.components||[]).map(c=>`${c.name}(${c.sap}:${c.qtyPerProduct})`).join(' — ')}</div></div>
+        <div>
+          <button class="btn small" data-id="${b.id}" data-action="edit" type="button">تعديل</button>
+          <button class="btn outline small" data-id="${b.id}" data-action="delete" type="button">حذف</button>
+        </div>`;
+      bomListEl.appendChild(li);
+    });
+    bomListEl.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id, action = btn.dataset.action;
+        if(action === 'delete'){
+          showModalDialog({
+            title: 'حذف BOM',
+            message: 'هل أنت متأكد من حذف قائمة الـ BOM؟',
+            showCancel: true,
+            onOk: () => {
+              state.boms = state.boms.filter(x=>x.id!==id);
+              save(); renderAll();
+              alert('تم حذف الـ BOM.');
+            }
+          });
+        }
+        if(action === 'edit'){
+          const b = state.boms.find(x=>x.id===id);
+          if(!b) return;
+          editingBomId = b.id;
+          bomName.value = b.name;
+          Array.from(bomLines.options).forEach(opt=> opt.selected = b.lines.includes(opt.value));
+          currentComponents = JSON.parse(JSON.stringify(b.components));
+          renderBomComponents();
+          state.boms = state.boms.filter(x=>x.id!==id);
+          save(); renderAll();
+        }
+      });
+    });
+  }
+
+  function renderCompDatalist(){
+    sapDatalist.innerHTML = '';
+    const sapSet = new Set(Object.keys(state.stock));
+    state.boms.forEach(b => b.components.forEach(c => sapSet.add(c.sap)));
+    Array.from(sapSet).forEach(sap => { const o = document.createElement('option'); o.value = sap; sapDatalist.appendChild(o); });
+    
+    // cartSAP
+    cartSAP.innerHTML = '';
+    Array.from(sapSet).forEach(sap => {
+      const opt = document.createElement('option');
+      opt.value = sap;
+      opt.textContent = sap + (state.stock[sap] ? ' • ' + (state.stock[sap].name || '') : '');
+      cartSAP.appendChild(opt);
+    });
+
+    // prodBom
+    prodBom.innerHTML = '<option value="">اختر المنتج</option>';
+    state.boms.forEach(b=> { const o = document.createElement('option'); o.value = b.id; o.textContent = b.name; prodBom.appendChild(o); });
+  }
+
+  function renderStockTable(){
+    stockTableBody.innerHTML = '';
+    const keys = Object.keys(state.stock);
+    if(keys.length === 0){ stockTableBody.innerHTML = '<tr><td colspan="5" class="center muted">المخزون فارغ</td></tr>'; return; }
+    keys.forEach(sap => {
+      const s = state.stock[sap];
+      const total = Object.values(s.lines || {}).reduce((a,b)=>a + (parseFloat(b)||0), 0);
+      const detail = Object.keys(s.lines || {}).map(l=>`${l}: ${s.lines[l]}`).join(' • ');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td data-label="SAP">${sap}</td><td data-label="اسم">${s.name||''}</td><td data-label="الكمية">${(Math.round(total*1000)/1000).toLocaleString()}</td><td data-label="تفاصيل">${detail || '-'}</td>
+        <td data-label="اجراءات">
+          <button class="btn small" data-sap="${sap}" data-act="view" type="button">عرض</button>
+          <button class="btn small" data-sap="${sap}" data-act="editLine" type="button">تعديل سطر</button>
+        </td>`;
+      stockTableBody.appendChild(tr);
+    });
+    stockTableBody.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const sap = btn.dataset.sap, act = btn.dataset.act;
+        if(act === 'view'){
+          const s = state.stock[sap];
+          let msg = `سجل ${s.name} (${sap}):\n`;
+          (s.history || []).slice().reverse().forEach(h => msg += `${h.when ? new Date(h.when).toLocaleString() : '-'} — ${h.type} — ${h.qty} — ${h.line || '-'} — ${h.note || ''}\n`);
+          showModalDialog({
+            title: `سجل حركة: ${s.name}`,
+            message: msg || 'لا يوجد سجل',
+            showCancel: false
+          });
+        } else if(act === 'editLine'){
+          const s = state.stock[sap];
+          const available = Array.from(new Set(['خط 1','خط 2','خط 3','خط 4','خط 5', ...Object.keys(s.lines||{})]));
+          showModalDialog({
+            title: 'اختيار الخط',
+            message: `اختر اسم الخط للتعديل:\n${available.join(' , ')}`,
+            showInput: true,
+            defaultValue: available[0],
+            showCancel: true,
+            onOk: (chosen) => {
+              if(!chosen) return;
+              editStockLine(sap, chosen.trim());
+            }
+          });
+        }
+      });
+    });
+  }
+
+  function renderCartList(){
+    cartList.innerHTML = '';
+    if(state.carts.length === 0){ cartList.innerHTML = '<li class="muted">لا توجد عربيات مسجلة.</li>'; return; }
+    state.carts.forEach(c => {
+      const started = c.addedAt ? new Date(c.addedAt).toLocaleString() : '-';
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${c.name}</strong><div class="muted">${c.sap} — ${c.line}</div><div class="muted">كمية: ${c.qty} — تغطية: ${c.coverageHours} ساعة — بدأ: ${started}</div></div>
+        <div>
+          <button class="btn small" data-id="${c.id}" data-act="start" type="button">بدء الآن</button>
+          <button class="btn small" data-id="${c.id}" data-act="edit" type="button">تعديل</button>
+          <button class="btn outline small" data-id="${c.id}" data-act="del" type="button">حذف</button>
+        </div>`;
+      cartList.appendChild(li);
+    });
+    cartList.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.dataset.id, act = b.dataset.act;
+        if(act === 'start') startCartNow(id);
+        if(act === 'edit') editCart(id);
+        if(act === 'del') deleteCart(id);
+      });
+    });
+  }
+
+  function renderProdList(){
+    prodList.innerHTML = '';
+    if(state.productions.length === 0){ prodList.innerHTML = '<li class="muted">لا توجد أوامر إنتاج.</li>'; return; }
+    state.productions.slice().reverse().forEach(p => {
+      const when = new Date(p.when).toLocaleString();
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${p.bomName}</strong><div class="muted">كمية: ${p.qty} — ${when} — ${p.line}</div><div class="muted">${(p.consumed||[]).map(c=>`${c.name}:${c.qty}`).join(' | ')}</div></div>
+        <div>
+          <button class="btn small" data-id="${p.id}" data-act="edit" type="button">تعديل</button>
+          <button class="btn outline small" data-id="${p.id}" data-act="del" type="button">حذف</button>
+        </div>`;
+      prodList.appendChild(li);
+    });
+    prodList.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.dataset.id, act = b.dataset.act;
+        if(act === 'edit') editProduction(id);
+        if(act === 'del'){
+          showModalDialog({
+            title: 'تأكيد الحذف',
+            message: 'هل تريد حذف أمر الإنتاج؟',
+            showCancel: true,
+            onOk: () => {
+              state.productions = state.productions.filter(x=>x.id!==id);
+              save(); renderAll();
+              alert('تم حذف أمر الإنتاج.');
+            }
+          });
+        }
+      });
+    });
+  }
+
+  function renderReports(){
+    detailedStockTbody.innerHTML = '';
+    Object.keys(state.stock).forEach(sap => {
+      const s = state.stock[sap];
+      Object.keys(s.lines||{}).forEach(line => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td data-label="SAP">${sap}</td><td data-label="الاسم">${s.name}</td><td data-label="الخط">${line}</td><td data-label="الكمية">${s.lines[line]}</td><td data-label="سجل"><button class="btn small" data-sap="${sap}" data-line="${line}" data-act="viewHist" type="button">عرض</button></td>`;
+        detailedStockTbody.appendChild(tr);
+      });
+    });
+    detailedStockTbody.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const sap = b.dataset.sap, line = b.dataset.line;
+        const s = state.stock[sap];
+        if(!s) return;
+        const hist = (s.history||[]).filter(h=>h.line===line);
+        let msg = `سجل ${s.name} — ${sap} — ${line}:\n`;
+        hist.slice().reverse().forEach(h=> msg += `${h.when ? new Date(h.when).toLocaleString() : '-'} — ${h.type} — ${h.qty} — ${h.note||''}\n`);
+        showModalDialog({
+          title: `سجل حركة الخط: ${line}`,
+          message: msg || 'لا يوجد سجل',
+          showCancel: false
+        });
+      });
+    });
+
+    // carts detailed
+    detailedCarts.innerHTML = '';
+    state.carts.forEach(c=>{
+      const started = c.addedAt ? new Date(c.addedAt).toLocaleString() : '-';
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${c.name}</strong><div class="muted">${c.sap} — ${c.line}</div><div class="muted">كمية:${c.qty} — تغطية:${c.coverageHours} ساعة — بدأ:${started}</div></div>`;
+      detailedCarts.appendChild(li);
+    });
+  }
+
+  // ---------- Chart ----------
+  function renderChart(){
+    const lines = ['خط 1','خط 2','خط 3','خط 4','خط 5'];
+    const finalData = lines.map(L => {
+      return Object.values(state.stock).reduce((acc, s) => acc + (parseFloat((s.lines && s.lines[L]) || 0)), 0);
+    }).map(n => Math.round(n*1000)/1000);
+    if(stockChart){ stockChart.data.datasets[0].data = finalData; stockChart.update(); return; }
+    stockChart = new Chart(ctx, {
+      type:'bar',
+      data:{ labels: lines, datasets:[{ label:'مجموع الوحدات', data: finalData, backgroundColor:['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd'] }] },
+      options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+    });
+  }
+
+  // ---------- Load plan ----------
+  function aggregateRequirementsWindow(days=7){
+    const now = new Date();
+    const limit = new Date(); limit.setDate(limit.getDate() + days);
+    const candidates = state.productions.filter(p => new Date(p.when) >= now && new Date(p.when) <= limit);
+    const use = candidates.length ? candidates : state.productions.slice(-5);
+    const req = {};
+    use.forEach(p => p.consumed.forEach(c => req[c.sap] = (req[c.sap] || 0) + c.qty));
+    return req;
+  }
+
+  function generateLoadPlan(){
+    const required = aggregateRequirementsWindow();
+    const toMove = [];
+    Object.keys(required).forEach(sap => {
+      const need = required[sap];
+      const have = Object.values((state.stock[sap] && state.stock[sap].lines) || {}).reduce((a,b)=>a + (parseFloat(b)||0),0);
+      const move = Math.max(0, Math.round((need - have)*1000)/1000);
+      if(move>0) toMove.push({ sap, qty: move, name: state.stock[sap] ? state.stock[sap].name : '' });
+    });
+    if(toMove.length === 0){
+      const low = Object.values(state.stock).map(s=>({sap:s.sap,name:s.name, qty: Object.values(s.lines||{}).reduce((a,b)=>a+(parseFloat(b)||0),0)})).sort((a,b)=>a.qty-b.qty).slice(0,6);
+      return { toMove: low, assignments: [], note: 'لا توجد حركات للأوامر القادمة — عرض المواد منخفضة المخزون.' };
+    }
+    const cartsSnapshot = JSON.parse(JSON.stringify(state.carts.map(c=>({...c, remaining: c.qty, loads: []}))));
+    toMove.forEach(item=>{
+      let left = item.qty;
+      const pref = cartsSnapshot.filter(c => c.sap === item.sap && c.remaining > 0);
+      const others = cartsSnapshot.filter(c => c.sap === item.sap && !pref.includes(c) && c.remaining > 0);
+      const candidates = pref.concat(others);
+      for(const cart of candidates){
+        if(left <= 0) break;
+        const take = Math.min(left, cart.remaining);
+        if(take <= 0) continue;
+        cart.loads.push({ sap: item.sap, qty: take });
+        cart.remaining -= take;
+        left = Math.round((left - take)*1000)/1000;
+      }
+      if(left>0) item.unmet = left;
+    });
+    return { toMove, assignments: cartsSnapshot, note: 'خطة تحميل مقترحة.' };
+  }
+
+  function renderLoadPlanUI(plan){
+    loadPlanBox.innerHTML = '';
+    if(!plan) return loadPlanBox.innerText = 'لا توجد خطة.';
+    const note = document.createElement('div'); note.className='muted'; note.innerText = plan.note; loadPlanBox.appendChild(note);
+    if(!plan.toMove || !plan.toMove.length){ loadPlanBox.appendChild(document.createElement('div')).innerText = 'لا توجد حركات.'; return; }
+    const ul = document.createElement('ul'); ul.style.listStyle='none'; ul.style.padding='0';
+    plan.toMove.forEach(it=>{
+      const li = document.createElement('li'); li.style.padding='6px 0';
+      li.innerHTML = `<strong>${it.name || it.sap}</strong> — للتحميل: ${it.qty} وحدة ${it.unmet ? `<span style="color:var(--danger)"> — غير مُلبَّى: ${it.unmet}</span>` : ''}`;
+      ul.appendChild(li);
+    });
+    loadPlanBox.appendChild(ul);
+    const assignDiv = document.createElement('div'); assignDiv.style.marginTop='8px';
+    plan.assignments.forEach(c=>{
+      const used = c.qty - c.remaining;
+      const div = document.createElement('div'); div.style.marginTop='6px';
+      div.innerHTML = `<strong>${c.name}</strong> — محمل: ${used} / ${c.qty} — ${c.sap || '-'} — ${c.line}<div class="muted">${c.loads.map(l=>`${l.sap}(${l.qty})`).join(', ')||'فارغ'}</div>`;
+      assignDiv.appendChild(div);
+    });
+    loadPlanBox.appendChild(assignDiv);
+  }
+
+  // ---------- Alerts ----------
+  const ALERT_INTERVAL = 60 * 1000;
+  function checkAlerts(){
+    const alerts = [];
+    const now = Date.now();
+    state.carts.forEach(c=>{
+      if(!c.addedAt) return;
+      const started = new Date(c.addedAt).getTime();
+      const elapsedH = (now - started) / (1000*60*60);
+      const remainH = c.coverageHours - elapsedH;
+      if(remainH <= 0) alerts.push({ type:'cart', text:`العربية ${c.name} للمكون ${c.sap} انتهت تغطيتها الآن.`, important:true });
+      else if(remainH <= 0.25) alerts.push({ type:'cart', text:`⚠️ العربية ${c.name} تحتاج تعبئة خلال أقل من 15 دقيقة.`, important:true });
+      else if(remainH <= 1) alerts.push({ type:'cart', text:`تذكير: العربية ${c.name} ستحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة.` });
+    });
+    Object.values(state.stock).forEach(s=>{
+      const total = Object.values(s.lines||{}).reduce((a,b)=>a + (parseFloat(b)||0),0);
+      const threshold = s.threshold || 5;
+      if(total <= threshold) alerts.push({ type:'stock', text:`المكون ${s.name} (${s.sap}) كمية منخفضة: ${total}`, important:true });
+    });
+
+    alertsDiv.innerHTML = '';
+    if(alerts.length === 0){ alertsDiv.innerHTML = '<div class="muted">لا توجد تنبيهات حالية.</div>'; document.body.classList.remove('flash'); return; }
+    const important = alerts.some(a=>a.important);
+    if(important){
+      playAlertBeep();
+      document.body.classList.add('flash');
+      setTimeout(()=>document.body.classList.remove('flash'), 8000);
+    }
+    alerts.forEach(a=>{ const el = document.createElement('div'); el.className='alert'; el.innerText = a.text; alertsDiv.appendChild(el); });
+  }
+  checkAlerts();
+  setInterval(checkAlerts, ALERT_INTERVAL);
+
+  // expose for debugging & Excel handlers
+  window._factoryState = state;
+  window._saveState = save;
+
+  // initial render
+  renderAll();
+
+  // buttons in dashboard
+  document.getElementById('btn-generate-plan').addEventListener('click', ()=> renderLoadPlanUI(generateLoadPlan()));
+  document.getElementById('btn-check-alerts').addEventListener('click', ()=> { checkAlerts(); alert('تم فحص التنبيهات.'); });
+  document.getElementById('btn-reset').addEventListener('click', ()=> {
+    showModalDialog({
+      title: 'مسح البيانات',
+      message: 'هل تريد حذف كل البيانات المحلية المخزنة في المتصفح؟',
+      showCancel: true,
+      onOk: () => {
+        localStorage.removeItem(STORAGE_KEY);
+        state = load();
+        window._factoryState = state;
+        renderAll();
+        alert('تم مسح البيانات بنجاح.');
+      }
+    });
+  });
+
+})();
+</script>
+
+<!-- Excel import/export handlers -->
+<script>
+(function(){
+  if(typeof XLSX === 'undefined'){ return; }
+  function aoaToWorkbook(aoa, sheetName){ const ws=XLSX.utils.aoa_to_sheet(aoa); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheetName||'Sheet1'); return wb; }
+  function downloadWB(wb, name){ XLSX.writeFile(wb, name||'data.xlsx'); }
+  function parseExcel(file){
+    return new Promise((res,rej)=>{
+      const r = new FileReader();
+      r.onload = e => { try{ const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; const json=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true}); res(json); }catch(err){ rej(err);} };
+      r.onerror = rej;
+      r.readAsArrayBuffer(file);
+    });
+  }
+  function toLineLabel(val){ if(!val) return ''; const s=String(val).trim(); if(/^خط\s*\d+$/.test(s)) return s; if(/^\d+$/.test(s)) return 'خط '+s; return s; }
+
+  // BOM
+  const btnTemplateBOM = document.getElementById('btn-template-bom');
+  const btnExportBOM = document.getElementById('btn-export-bom');
+  const btnImportBOM = document.getElementById('btn-import-bom');
+  const bomExcel = document.getElementById('bomExcel');
+
+  btnTemplateBOM && btnTemplateBOM.addEventListener('click', ()=>{
+    const wb = aoaToWorkbook([['اسم المكون','كود الساب','الكمية لكل منتج'],['','','']], 'BOM');
+    downloadWB(wb, 'bom_template.xlsx');
+  });
+
+  btnExportBOM && btnExportBOM.addEventListener('click', ()=>{
+    const rows = [['اسم المكون','كود الساب','الكمية لكل منتج']];
+    const list = document.querySelectorAll('#bomCompList li');
+    list.forEach(li => {
+      const m = (li.textContent||'').match(/^(.*?)\s+—\s+SAP:\s*(.*?)\s+—.*?[:：]\s*([\d.]+)/);
+      if(m) rows.push([m[1].trim(), m[2].trim(), parseFloat(m[3])||0]);
+    });
+    const wb = aoaToWorkbook(rows, 'BOM'); downloadWB(wb, 'bom_components.xlsx');
+  });
+
+  btnImportBOM && bomExcel && btnImportBOM.addEventListener('click', async ()=>{
+    const f = bomExcel.files && bomExcel.files[0];
+    if(!f) return alert('اختَر ملف Excel أولاً.');
+    try{
+      const data = await parseExcel(f);
+      const addBtn = document.getElementById('btn-add-comp');
+      const inName = document.getElementById('compName');
+      const inSAP = document.getElementById('compSAP');
+      const inQty = document.getElementById('compQtyPerProd');
+      let added = 0;
+      data.forEach(r => {
+        const name = r['اسم المكون'] || r['component name'] || r['name'] || r['اسم'] || '';
+        const sap  = r['كود الساب'] || r['SAP'] || r['sap'] || r['material'] || '';
+        const qty  = r['الكمية لكل منتج'] || r['qty per product'] || r['quantity'] || r['qty'] || '';
+        if(name && sap && parseFloat(qty)>0){
+          inName.value = String(name).trim();
+          inSAP.value = String(sap).trim();
+          inQty.value = parseFloat(qty)||0;
+          addBtn.click();
+          added++;
+        }
+      });
+      alert('تم استيراد '+added+' مكوِّن.');
+    }catch(e){ console.error(e); alert('فشل استيراد BOM.'); }
+  });
+
+  // STOCK
+  const btnTemplateStock = document.getElementById('btn-template-stock');
+  const btnImportStock = document.getElementById('btn-import-stock');
+  const stockExcel = document.getElementById('stockExcel');
+  const stockImportLine = document.getElementById('stockImportLine');
+  const stockImportDatetime = document.getElementById('stockImportDatetime');
+
+  btnTemplateStock && btnTemplateStock.addEventListener('click', ()=>{
+    const wb = aoaToWorkbook([['material','quantity withdrawn'],['','']], 'Stock');
+    downloadWB(wb, 'stock_template.xlsx');
+  });
+
+  btnImportStock && stockExcel && btnImportStock.addEventListener('click', async ()=>{
+    const f = stockExcel.files && stockExcel.files[0];
+    if(!f) return alert('اختَر ملف Excel أولاً.');
+    try{
+      const data = await parseExcel(f);
+      const line = stockImportLine ? stockImportLine.value : 'خط 1';
+      const when = stockImportDatetime && stockImportDatetime.value ? new Date(stockImportDatetime.value).toISOString() : new Date().toISOString();
+      let count=0;
+      const state = window._factoryState;
+      data.forEach(r => {
+        const sap = (r['material'] || r['SAP'] || r['sap'] || '').toString().trim();
+        const qty = parseFloat(r['quantity withdrawn'] || r['quantity'] || r['qty'] || '0') || 0;
+        if(!sap || qty<=0) return;
+        if(!state.stock[sap]) state.stock[sap] = { sap, name: sap, lines:{}, history:[] };
+        const prev = state.stock[sap].lines[line] || 0;
+        state.stock[sap].lines[line] = Math.round((prev + qty)*1000)/1000;
+        state.stock[sap].history.push({ id: 'st_'+Math.random().toString(36).slice(2,9), type:'in', qty, when, line, note:'استيراد Excel', by:'user' });
+        count++;
+      });
+      window._saveState();
+      // Re-render
+      const activeTab = document.querySelector('.nav .tab.active');
+      if(activeTab) activeTab.click();
+      alert('تم استيراد المخزون: '+count+' صف.');
+    }catch(e){ console.error(e); alert('فشل استيراد المخزون.'); }
+  });
+
+  // CARTS
+  const btnTemplateCarts = document.getElementById('btn-template-carts');
+  const btnImportCarts = document.getElementById('btn-import-carts');
+  const cartsExcel = document.getElementById('cartsExcel');
+
+  btnTemplateCarts && btnTemplateCarts.addEventListener('click', ()=>{
+    const wb = aoaToWorkbook([['اسم العربية','الكمية التي تشيلها','مدة التغطية بالساعة','رقم الخط','الموديل (اسم الـBOM)'],['','','','','']], 'Carts');
+    downloadWB(wb, 'carts_template.xlsx');
+  });
+
+  btnImportCarts && cartsExcel && btnImportCarts.addEventListener('click', async ()=>{
+    const f = cartsExcel.files && cartsExcel.files[0];
+    if(!f) return alert('اختَر ملف Excel أولاً.');
+    try{
+      const data = await parseExcel(f);
+      let added=0;
+      const state = window._factoryState;
+      data.forEach(r => {
+        const name = (r['اسم العربية'] || r['car name'] || r['name'] || '').toString().trim();
+        const qty  = parseInt(r['الكمية التي تشيلها'] || r['capacity'] || r['qty'] || '0',10) || 0;
+        const hours= parseInt(r['مدة التغطية بالساعة'] || r['coverage hours'] || r['hours'] || '0',10) || 0;
+        const line = toLineLabel(r['رقم الخط'] || r['line'] || '');
+        const model= (r['الموديل (اسم الـBOM)'] || r['model'] || r['bom'] || '').toString().trim();
+        if(!name || !qty || !hours || !line) return;
+        let sap = '';
+        if(model && Array.isArray(state.boms)){
+          const b = state.boms.find(x => (x.name||'').trim() === model);
+          if(b && b.components && b.components.length){ sap = (b.components[0].sap || '').toString(); }
+        }
+        state.carts.push({ id:'cart_'+Math.random().toString(36).slice(2,9), name, sap, qty, coverageHours:hours, line, addedAt:null, bomName:model||'' });
+        added++;
+      });
+      window._saveState();
+      // Re-render
+      const activeTab = document.querySelector('.nav .tab.active');
+      if(activeTab) activeTab.click();
+      alert('تم استيراد العربيات: '+added+' صف.');
+    }catch(e){ console.error(e); alert('فشل استيراد العربيات.'); }
+  });
+
+})(); 
+</script>
+
+</body>
+</html>

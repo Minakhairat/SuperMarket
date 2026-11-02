@@ -1,0 +1,16 @@
+{
+  "name": "supermarket-pro",
+  "version": "1.0.0",
+  "description": "SuperMarketPro - نظام السوبرماركت قبل خط الإنتاج",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node -e \"console.log('Build OK')\"",
+    "lint": "node -e \"console.log('Lint OK')\""
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
