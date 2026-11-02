@@ -1,6 +1,9 @@
 {
   "name": "SuperMarketPro",
-  "description": "نظام السوبرماركت قبل خط الإنتاج (SAP codes، 5 خطوط إنتاج، وتنبيهات ومخزون وعربيات التداول)",
+  "description": "نظام السوبرماركت قبل خط الإنتاج مدعوم بالذكاء الاصطناعي - إدارة أكواد SAP، 5 خطوط إنتاج، وتنبيهات تغذية العربيات، وتحليل الإنتاج الذكي",
   "permissions": [],
-  "capabilities": []
+  "capabilities": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

@@ -11,6 +11,7 @@
     "lint": "node -e \"console.log('Lint OK')\""
   },
   "dependencies": {
+    "@google/genai": "^2.32.0",
     "express": "^4.21.2"
   }
 }

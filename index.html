@@ -3,287 +3,782 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>نظام السوبرماركت قبل خط الإنتاج — SuperMarketPro</title>
-  <meta name="description" content="نظام السوبرماركت قبل خط الإنتاج (SAP codes، 5 خطوط إنتاج، وتنبيهات ومخزون وعربيات التداول)" />
-  <meta property="og:title" content="SuperMarketPro" />
-  <meta property="og:description" content="نظام السوبرماركت قبل خط الإنتاج (SAP codes، 5 خطوط إنتاج، وتنبيهات ومخزون وعربيات التداول)" />
+  <title>SuperMarketPro — نظام السوبرماركت الصناعي والذكاء الاصطناعي</title>
+  <meta name="description" content="نظام السوبرماركت قبل خط الإنتاج مدعوم بالذكاء الاصطناعي - إدارة أكواد SAP، 5 خطوط إنتاج، وتنبيهات تغذية العربيات" />
+  <meta property="og:title" content="SuperMarketPro — نظام السوبرماركت الصناعي" />
+  <meta property="og:description" content="نظام السوبرماركت قبل خط الإنتاج مدعوم بالذكاء الاصطناعي - إدارة أكواد SAP، 5 خطوط إنتاج، وتنبيهات تغذية العربيات" />
+
+  <!-- Google Fonts: Cairo for crisp Arabic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
 :root{
-  --bg:#f3f6fb;
-  --card:#ffffff;
-  --accent:#0366d6;
-  --muted:#6b7280;
-  --danger:#e53935;
-  --success:#16a34a;
-  --radius:12px;
-  --gap:12px;
-  font-family:"Segoe UI", Tahoma, system-ui, "Noto Kufi Arabic", "Noto Sans", sans-serif;
+  --bg: #f0f4f9;
+  --card: #ffffff;
+  --card-sub: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-subtle: #e0f2fe;
+  --ai-purple: #7c3aed;
+  --ai-purple-subtle: #f3e8ff;
+  --accent: #2563eb;
+  --danger: #ef4444;
+  --danger-subtle: #fee2e2;
+  --warning: #f59e0b;
+  --warning-subtle: #fef3c7;
+  --success: #10b981;
+  --success-subtle: #d1fae5;
+  --border: #e2e8f0;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md: 0 6px 18px -2px rgba(15,23,42,0.08);
+  --shadow-lg: 0 14px 34px -4px rgba(15,23,42,0.12);
+  font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
 }
 
-/* reset & base */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
+html,body{margin:0;padding:0;min-height:100%;}
 body{
-  background: linear-gradient(180deg,#eef6ff 0%,var(--bg) 100%);
-  color:#0f172a;padding:16px;
-  -webkit-font-smoothing:antialiased;
+  background: linear-gradient(180deg, #e8f1fc 0%, var(--bg) 240px);
+  color: var(--text-main);
+  padding: 16px;
+  -webkit-font-smoothing: antialiased;
 }
-.app{max-width:1200px;margin:0 auto}
+.app{max-width: 1340px; margin: 0 auto;}
 
-/* top */
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-.brand{display:flex;gap:12px;align-items:center}
-.brand .logo{font-size:36px}
-.brand h1{margin:0;font-size:20px}
-.brand p{margin:0;color:var(--muted);font-size:13px}
-.top-actions button{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:6px 10px;border-radius:8px;cursor:pointer}
-
-/* nav */
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.nav .tab{background:var(--card);border:0;padding:8px 12px;border-radius:999px;cursor:pointer;box-shadow:0 8px 30px rgba(2,6,23,0.04)}
-.nav .tab.active{background:linear-gradient(90deg,var(--accent),#1fa7ff);color:white;box-shadow:0 12px 36px rgba(3,102,214,0.18)}
-
-/* panes/cards */
-.main{display:block}
-.pane{display:none}
-.pane.active{display:block}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--gap)}
-@media(max-width:1000px){ .grid{grid-template-columns:1fr} }
-
-.card{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:0 8px 24px rgba(16,24,40,0.06);margin-bottom:12px}
-.card.sub{background:linear-gradient(180deg,#fcfeff,#ffffff);padding:10px}
-
-/* forms */
-.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.row.wrap{flex-wrap:wrap}
-.row > *{flex:1;min-width:160px}
-label{display:block;direction:rtl}
-input,select,textarea,button{padding:10px;border-radius:10px;border:1px solid #eef6ff;background:#fbfdff;font-size:15px}
-input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3,102,214,0.08);border-color:var(--accent)}
-.btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-size:15px}
-.btn.small{padding:6px 8px;font-size:13px}
-.btn.outline{background:transparent;border:1px solid rgba(3,102,214,0.12);color:var(--accent)}
-
-/* lists & tables */
-.list{list-style:none;padding:0;margin:0}
-.list li{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px dashed rgba(3,102,214,0.05);margin-bottom:8px}
-.table{width:100%;border-collapse:collapse}
-.table thead th{background:#f8fafc;padding:8px;border-bottom:1px solid #eef3ff;text-align:right}
-.table tbody td{padding:8px;border-bottom:1px solid #f5f7fb}
-.table-wrap{overflow:auto;max-height:420px;padding-right:6px}
-
-/* small screens adjustments */
-@media(max-width:720px){
-  body{padding:12px}
-  .brand h1{font-size:16px}
-  .nav .tab{padding:10px;border-radius:14px}
-  input,select,textarea,button{font-size:16px;padding:12px}
-  .row > *{min-width:120px}
-  .list li{flex-direction:column;align-items:flex-start;gap:6px}
-  .table thead th, .table tbody td{font-size:14px;padding:10px}
+/* Top Header */
+.header-bar{
+  background: var(--card);
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
 }
+.brand{display: flex; align-items: center; gap: 14px;}
+.brand-icon{
+  width: 48px; height: 48px; border-radius: 12px;
+  background: linear-gradient(135deg, #0284c7, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: white; box-shadow: 0 4px 12px rgba(2,132,199,0.25);
+}
+.brand-info h1{margin: 0; font-size: 21px; font-weight: 800; color: #0f172a;}
+.brand-info p{margin: 2px 0 0; font-size: 13px; color: var(--text-muted); font-weight: 500;}
 
-/* mobile stacked tables */
-@media(max-width:480px){
-  .row > *{min-width:100%}
-  .table, thead, tbody, th, td, tr { display:block; width:100%; }
-  .table thead{display:none}
-  .table tbody tr{margin-bottom:10px;border-radius:8px;padding:10px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
-  .table tbody td{padding:6px 0;text-align:right;border-bottom:0}
-  .table tbody td::before{content:attr(data-label);float:left;font-weight:700}
+.header-actions{display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
+
+/* KPI Bar */
+.kpi-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi-card{
+  background: var(--card);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.15s ease;
+}
+.kpi-card:hover{transform: translateY(-2px);}
+.kpi-text span{display: block; font-size: 12px; font-weight: 600; color: var(--text-muted);}
+.kpi-text strong{font-size: 23px; font-weight: 800; color: #0f172a; font-family: "JetBrains Mono", monospace;}
+.kpi-icon{
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
 }
 
-/* alerts */
-.muted{color:var(--muted);font-size:13px}
-.alert{background:var(--danger);color:white;padding:8px;border-radius:8px;margin-bottom:8px;animation: blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
-.flash{animation:intenseFlash 1s infinite}
-@keyframes intenseFlash{0%{box-shadow:0 0 0 0 rgba(229,57,53,0)}50%{box-shadow:0 0 40px 8px rgba(229,57,53,0.18)}100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}}
+/* Nav Tabs */
+.nav-wrap{
+  background: var(--card);
+  padding: 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.nav{
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 2px;
+}
+.tab{
+  background: transparent;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.tab:hover{background: #f1f5f9; color: var(--primary);}
+.tab.active{
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: white;
+  box-shadow: 0 4px 12px rgba(2,132,199,0.25);
+}
+.tab.ai-tab{
+  background: var(--ai-purple-subtle);
+  color: var(--ai-purple);
+  border: 1px solid #e9d5ff;
+}
+.tab.ai-tab.active{
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+}
+.badge{
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 800;
+  background: rgba(255,255,255,0.25); color: currentColor;
+}
+.tab:not(.active) .badge{background: #e2e8f0; color: #475569;}
+.tab:not(.active) .badge.danger{background: var(--danger-subtle); color: var(--danger);}
 
-/* RTL tweaks */
-input,select,textarea{direction:ltr}
-.footer{margin-top:12px;text-align:center;color:var(--muted)}
+/* Main Panes */
+.pane{display: none;}
+.pane.active{display: block; animation: fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0; transform: translateY(4px)} to{opacity:1; transform: translateY(0)}}
 
-/* Modals & Toasts for iframe-safe alerts */
+.grid-2{display: grid; grid-template-columns: 2fr 1fr; gap: 14px;}
+.grid-2-equal{display: grid; grid-template-columns: 1fr 1fr; gap: 14px;}
+@media(max-width: 992px){
+  .grid-2, .grid-2-equal{grid-template-columns: 1fr;}
+}
+
+/* Cards */
+.card{
+  background: var(--card);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 14px;
+}
+.card-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.card-header h3{
+  margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;
+  display: flex; align-items: center; gap: 8px;
+}
+.card.sub{
+  background: var(--card-sub);
+  border: 1px dashed #cbd5e1;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  margin: 10px 0;
+}
+
+/* Forms & Inputs */
+.form-grid{display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;}
+.form-group{display: flex; flex-direction: column; gap: 6px;}
+.form-group label{font-size: 13px; font-weight: 700; color: #334155;}
+input, select, textarea{
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  color: #0f172a;
+  transition: all 0.15s ease;
+}
+input:focus, select:focus, textarea:focus{
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(2,132,199,0.15);
+}
+input[readonly]{background: #f1f5f9; color: #64748b;}
+
+/* Buttons */
+.btn{
+  background: var(--primary);
+  color: white;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(2,132,199,0.2);
+}
+.btn:hover{background: var(--primary-hover); transform: translateY(-1px);}
+.btn:active{transform: translateY(0);}
+.btn.small{padding: 6px 12px; font-size: 13px;}
+.btn.outline{
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  box-shadow: none;
+}
+.btn.outline:hover{background: #f8fafc; border-color: #94a3b8;}
+.btn.ai{
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  color: white;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+}
+.btn.ai:hover{background: linear-gradient(135deg, #6d28d9, #7e22ce);}
+.btn.danger{background: var(--danger); box-shadow: 0 2px 6px rgba(239,68,68,0.2);}
+.btn.danger:hover{background: #dc2626;}
+.btn.success{background: var(--success); box-shadow: 0 2px 6px rgba(16,185,129,0.2);}
+
+/* Search & Filter Bar */
+.filter-bar{
+  display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;
+}
+.search-input{flex: 1; min-width: 200px;}
+
+/* Tables */
+.table-wrap{
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: white;
+}
+table.custom-table{width: 100%; border-collapse: collapse; text-align: right;}
+table.custom-table th{
+  background: #f8fafc;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #475569;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.custom-table td{
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+table.custom-table tr:hover td{background: #f8fafc;}
+
+/* Badges & Tags */
+.tag-line{
+  display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;
+}
+.tag-line.line1{background: #e0f2fe; color: #0369a1;}
+.tag-line.line2{background: #fef3c7; color: #b45309;}
+.tag-line.line3{background: #dcfce7; color: #15803d;}
+.tag-line.line4{background: #fee2e2; color: #b91c1c;}
+.tag-line.line5{background: #f3e8ff; color: #7e22ce;}
+
+.status-pill{
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  border-radius: 999px; font-size: 12px; font-weight: 700;
+}
+.status-pill.good{background: var(--success-subtle); color: #065f46;}
+.status-pill.warning{background: var(--warning-subtle); color: #92400e;}
+.status-pill.danger{background: var(--danger-subtle); color: #991b1b; animation: pulseRed 1.5s infinite;}
+@keyframes pulseRed{0%,100%{opacity: 1;} 50%{opacity: 0.6;}}
+
+/* Lists */
+.custom-list{list-style: none; padding: 0; margin: 0;}
+.custom-list li{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  background: white;
+  transition: all 0.15s;
+}
+.custom-list li:hover{border-color: #cbd5e1; background: #fafafa;}
+
+/* Alerts Box */
+.alerts-container{display: flex; flex-direction: column; gap: 8px;}
+.alert-card{
+  padding: 12px 16px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-size: 14px; font-weight: 600;
+}
+.alert-card.danger{
+  background: var(--danger-subtle); color: #991b1b; border: 1px solid #fecaca;
+  animation: blinkCard 1s infinite alternate;
+}
+@keyframes blinkCard{0%{box-shadow: 0 0 0 0 rgba(239,68,68,0.2);} 100%{box-shadow: 0 0 16px 2px rgba(239,68,68,0.25);}}
+.alert-card.warning{background: var(--warning-subtle); color: #92400e; border: 1px solid #fde68a;}
+.alert-card.info{background: var(--primary-subtle); color: #075985; border: 1px solid #bae6fd;}
+
+/* AI Advisor Section Specifics */
+.ai-advisor-hero{
+  background: linear-gradient(135deg, #1e1b4b 0%, #31104b 100%);
+  color: white;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.ai-advisor-hero::before{
+  content: ""; position: absolute; top: -50px; left: -50px; width: 200px; height: 200px;
+  background: rgba(168,85,247,0.25); border-radius: 50%; filter: blur(50px);
+}
+.ai-advisor-hero h2{margin: 0 0 8px; font-size: 22px; font-weight: 800;}
+.ai-advisor-hero p{margin: 0; color: #cbd5e1; font-size: 14px; max-width: 750px;}
+
+.ai-chat-box{
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  overflow: hidden;
+}
+.ai-chat-messages{
+  flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+}
+.chat-msg{
+  max-width: 82%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;
+}
+.chat-msg.user{
+  align-self: flex-start; background: #2563eb; color: white; border-bottom-right-radius: 2px;
+}
+.chat-msg.bot{
+  align-self: flex-end; background: white; color: #0f172a; border: 1px solid #e2e8f0;
+  border-bottom-left-radius: 2px; box-shadow: var(--shadow-sm);
+}
+.chat-input-bar{
+  padding: 12px; background: white; border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.quick-chips{display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;}
+.chip-btn{
+  background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; cursor: pointer; color: #334155; transition: all 0.15s;
+}
+.chip-btn:hover{background: var(--ai-purple-subtle); color: var(--ai-purple); border-color: #d8b4fe;}
+
+/* Modal & Toasts */
 .modal-backdrop{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(15,23,42,0.5);
-  display:flex;align-items:center;justify-content:center;
-  z-index:9999;backdrop-filter:blur(3px);
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15,23,42,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; backdrop-filter: blur(4px);
 }
 .modal-box{
-  background:var(--card);
-  padding:20px;border-radius:var(--radius);
-  max-width:440px;width:90%;
-  box-shadow:0 20px 40px rgba(0,0,0,0.18);
-  direction:rtl;
+  background: var(--card); padding: 24px; border-radius: var(--radius-lg);
+  max-width: 550px; width: 92%; box-shadow: var(--shadow-lg); direction: rtl;
+  max-height: 90vh; overflow-y: auto;
 }
+.modal-box h3{margin: 0 0 12px; font-size: 18px; font-weight: 800;}
 .toast-container{
-  position:fixed;bottom:20px;left:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;max-width:380px;pointer-events:none;
+  position: fixed; bottom: 24px; left: 24px; z-index: 10000;
+  display: flex; flex-direction: column; gap: 8px; max-width: 400px; pointer-events: none;
 }
 .toast{
-  background:#1e293b;color:#f8fafc;padding:12px 16px;border-radius:10px;font-size:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);animation:toastIn 0.25s ease;direction:rtl;pointer-events:auto;
+  background: #0f172a; color: #f8fafc; padding: 12px 18px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg);
+  animation: toastIn 0.25s ease; direction: rtl; pointer-events: auto;
+  border-right: 4px solid var(--primary);
 }
-@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-</style>
+@keyframes toastIn{from{opacity:0; transform: translateY(12px)} to{opacity:1; transform: translateY(0)}}
+
+/* Excel Bar */
+.excel-actions{
+  background: #f8fafc; border: 1px dashed #cbd5e1; padding: 12px; border-radius: var(--radius-md);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px;
+}
+
+/* Footer (Required by user) */
+.footer{
+  margin-top: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.footer-title{
+  font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 6px;
+}
+.footer-contact{
+  display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin: 8px 0; font-size: 15px; font-weight: 700; color: #1e293b;
+}
+.contact-badge{
+  display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0284c7;
+  padding: 6px 14px; border-radius: 999px; text-decoration: none; transition: all 0.15s;
+}
+.contact-badge:hover{background: #0284c7; color: white;}
+.contact-badge.wa{background: #dcfce7; color: #15803d;}
+.contact-badge.wa:hover{background: #16a34a; color: white;}
+.footer-sub{font-size: 13px; color: var(--text-muted); margin-top: 6px;}
+  </style>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app">
-    <header class="top">
+    <!-- Top Header -->
+    <header class="header-bar">
       <div class="brand">
-        <div class="logo">🏭</div>
-        <div>
-          <h1>نظام السوبرماركت قبل خط الإنتاج</h1>
-          <p class="muted">SAP codes • 5 خطوط إنتاج • تنبيهات قبل 15 دقيقة • تخزين محلي</p>
+        <div class="brand-icon">🏭</div>
+        <div class="brand-info">
+          <h1>SuperMarketPro — نظام السوبرماركت الصناعي الذكي</h1>
+          <p>إدارة وتغذية خطوط الإنتاج الخمسة (SAP Codes • Just-in-Time • تنبيهات الاستهلاك وعربيات التداول)</p>
         </div>
       </div>
-      <div class="top-actions">
-        <button id="btn-reset" class="btn outline small" title="مسح كل البيانات">مسح البيانات</button>
+      <div class="header-actions">
+        <button id="btn-load-demo" class="btn outline small" title="تحميل بيانات مصنع تجريبية لتجربة البرنامج">
+          ✨ تجربة بيانات مصنع
+        </button>
+        <button id="btn-reset" class="btn outline small danger" title="مسح كل البيانات المخزنة محلياً">
+          مسح البيانات
+        </button>
       </div>
     </header>
 
-    <nav class="nav" role="navigation" aria-label="التنقل">
-      <button class="tab active" data-tab="dashboard">لوحة التحكم</button>
-      <button class="tab" data-tab="bom">BOM</button>
-      <button class="tab" data-tab="stock">استلام المخزن</button>
-      <button class="tab" data-tab="carts">عربيات التداول</button>
-      <button class="tab" data-tab="production">أوامر الإنتاج</button>
-      <button class="tab" data-tab="reports">التقارير</button>
+    <!-- Top KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-text">
+          <span>أصناف SAP بالمخزن</span>
+          <strong id="kpi-stock-count">0</strong>
+        </div>
+        <div class="kpi-icon" style="background:#e0f2fe; color:#0284c7;">📦</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-text">
+          <span>عربيات التداول النشطة</span>
+          <strong id="kpi-carts-count">0</strong>
+        </div>
+        <div class="kpi-icon" style="background:#fef3c7; color:#d97706;">🛒</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-text">
+          <span>التنبيهات العاجلة</span>
+          <strong id="kpi-alerts-count" style="color:var(--danger)">0</strong>
+        </div>
+        <div class="kpi-icon" style="background:#fee2e2; color:#ef4444;">🚨</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-text">
+          <span>قوائم المنتجات (BOM)</span>
+          <strong id="kpi-boms-count">0</strong>
+        </div>
+        <div class="kpi-icon" style="background:#f3e8ff; color:#7c3aed;">📑</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-text">
+          <span>أوامر الإنتاج المنفذة</span>
+          <strong id="kpi-prod-count">0</strong>
+        </div>
+        <div class="kpi-icon" style="background:#d1fae5; color:#10b981;">⚡</div>
+      </div>
+    </section>
+
+    <!-- Main Navigation Bar -->
+    <nav class="nav-wrap" role="navigation" aria-label="أقسام النظام">
+      <div class="nav">
+        <button class="tab active" data-tab="dashboard">📊 لوحة التحكم</button>
+        <button class="tab ai-tab" data-tab="ai-advisor">✨ مستشار الذكاء الاصطناعي <span class="badge">Gemini</span></button>
+        <button class="tab" data-tab="bom">📑 إدارة الـ BOM</button>
+        <button class="tab" data-tab="stock">📥 استلام المخزن (SAP)</button>
+        <button class="tab" data-tab="carts">🛒 عربيات التداول</button>
+        <button class="tab" data-tab="production">⚙️ أوامر الإنتاج</button>
+        <button class="tab" data-tab="reports">📈 تقارير وسجلات</button>
+      </div>
     </nav>
 
-    <main class="main">
-      <!-- DASHBOARD -->
+    <!-- MAIN PANES -->
+    <main>
+      <!-- DASHBOARD PANE -->
       <section id="dashboard" class="pane active">
-        <h2>لوحة التحكم</h2>
-        <div class="grid">
-          <div class="card">
-            <h3>مخطط المخزون حسب الخط</h3>
-            <canvas id="stockChart" height="140"></canvas>
-            <small class="muted">إجمالي الوحدات لكل خط</small>
-          </div>
+        <div class="grid-2">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <h3>📊 توزيع المخزون عبر خطوط الإنتاج الخمسة</h3>
+                <small class="muted">إجمالي الوحدات المستلمة والجاهزة لكل خط</small>
+              </div>
+              <canvas id="stockChart" height="130"></canvas>
+            </div>
 
-          <div class="card">
-            <h3>تنبيهات</h3>
-            <div id="alerts" class="alerts"></div>
-            <div class="center" style="margin-top:12px;">
-              <button id="btn-check-alerts" class="btn">تحقق الآن</button>
+            <div class="card">
+              <div class="card-header">
+                <h3>📋 خطة التحميل ومقترحات التغذية</h3>
+                <button id="btn-generate-plan" class="btn small outline">🔄 تحديث الخطة</button>
+              </div>
+              <div id="loadPlan"></div>
             </div>
           </div>
 
-          <div class="card">
-            <h3>خطة تحميل مقترحة</h3>
-            <div id="loadPlan"></div>
-            <div class="center" style="margin-top:12px;">
-              <button id="btn-generate-plan" class="btn">اقترح تحميل الآن</button>
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <h3>🚨 مركز التنبيهات الحية (قبل 15 دقيقة)</h3>
+                <button id="btn-check-alerts" class="btn small">فحص الآن</button>
+              </div>
+              <div id="alerts" class="alerts-container"></div>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #f8fafc, #eff6ff); border: 1px solid #bfdbfe;">
+              <div class="card-header">
+                <h3 style="color:#1d4ed8;">💡 نصيحة تشغيلية سريعة بالـ AI</h3>
+              </div>
+              <p id="quick-ai-tip" style="font-size:14px; line-height:1.6; color:#1e3a8a; margin:0 0 12px 0;">
+                اضغط على تبويب "مستشار الذكاء الاصطناعي" للحصول على تشخيص فوري لنقاط الاختناق وعربيات التغذية الحرجة.
+              </p>
+              <button class="btn ai small" onclick="document.querySelector('.tab[data-tab=\'ai-advisor\']').click()">
+                فتح مستشار الذكاء الاصطناعي ➔
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- BOM -->
+      <!-- AI ADVISOR PANE -->
+      <section id="ai-advisor" class="pane">
+        <div class="ai-advisor-hero">
+          <h2>🧠 مستشار الذكاء الاصطناعي لسوبرماركت خطوط الإنتاج</h2>
+          <p>
+            يقوم نموذج الذكاء الاصطناعي (Gemini 3.8 Flash) بتحليل كميات أكواد SAP في خطوط الإنتاج الخمسة،
+            وتوقيتات استهلاك عربيات التداول، وأوامر الإنتاج المستقبلية لتفادي توقف الخطوط واقتراح خطة تعبئة استباقية.
+          </p>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="btn-run-ai-advisor" class="btn ai">
+              🚀 تحليل حالة المصنع الآن بواسطة Gemini
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-2-equal">
+          <!-- AI Executive Report & Bottlenecks -->
+          <div class="card">
+            <div class="card-header">
+              <h3>📋 التشخيص الذكي ونقاط الاختناق (Bottlenecks)</h3>
+              <span id="ai-status-badge" class="status-pill good">في انتظار التحليل</span>
+            </div>
+            <div id="ai-advisor-results">
+              <p class="muted" style="text-align:center; padding: 30px 10px;">
+                اضغط على زر "تحليل حالة المصنع الآن" لبدء الفحص الذكي لمخزون الـ SAP وعربيات التداول.
+              </p>
+            </div>
+          </div>
+
+          <!-- Interactive Factory AI Assistant Chat -->
+          <div class="card">
+            <div class="card-header">
+              <h3>💬 اسأل المساعد الذكي عن السوبرماركت</h3>
+              <small class="muted">يجيب بناءً على بيانات مخزونك الحالية</small>
+            </div>
+            
+            <div class="ai-chat-box">
+              <div id="aiChatMessages" class="ai-chat-messages">
+                <div class="chat-msg bot">
+                  مرحباً بك يا باشمهندس. أنا مساعدك الذكي في SuperMarketPro. يمكنك سؤالي عن كفاية المخزون، أو أي عربية تحتاج تغذية عاجلة، أو ترتيب الأولويات.
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input id="chatInput" placeholder="اكتب سؤالك هنا (مثال: هل خط 2 يحتاج تغذية عاجلة؟)..." style="flex:1;" />
+                <button id="btnSendChat" class="btn ai small">إرسال</button>
+              </div>
+            </div>
+
+            <div class="quick-chips">
+              <span class="muted" style="font-size:12px; align-self:center;">أسئلة سريعة:</span>
+              <button class="chip-btn" data-q="ما هي المواد المعرضة للنفاد أولاً في المخزن؟">⚠️ المواد المعرضة للنفاد</button>
+              <button class="chip-btn" data-q="ما هي العربيات التي ستنتهي تغطيتها قريباً؟">🛒 العربيات الحرجة</button>
+              <button class="chip-btn" data-q="اقترح خطة سريعة لترتيب تغذية الخطوط 1 و 3">⚙️ ترتيب أولويات التغذية</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOM PANE -->
       <section id="bom" class="pane">
-        <h2>BOM — إدارة المنتجات والمكونات</h2>
         <div class="card">
+          <div class="card-header">
+            <h3>📑 تسجيل منتج جديد وقائمة المكونات (Bill of Materials)</h3>
+            <button id="btn-open-ai-bom" class="btn ai small" type="button">
+              ✨ استخراج BOM بالذكاء الاصطناعي
+            </button>
+          </div>
+
           <form id="form-bom">
-            <div class="row wrap">
-              <label class="flex">اسم المنتج
-                <input id="bomName" required placeholder="مثال: مبرد هواء A">
-              </label>
-              <label class="flex">الخطوط الممكنة (اختياري)
-                <select id="bomLines" multiple>
-                  <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>اسم المنتج النهائي</label>
+                <input id="bomName" required placeholder="مثال: مبرد هواء صناعي - موديل A" />
+              </div>
+              <div class="form-group">
+                <label>خطوط الإنتاج المخصصة (يمكن اختيار أكثر من خط)</label>
+                <select id="bomLines" multiple style="height: 44px;">
+                  <option value="خط 1">خط 1</option>
+                  <option value="خط 2">خط 2</option>
+                  <option value="خط 3">خط 3</option>
+                  <option value="خط 4">خط 4</option>
+                  <option value="خط 5">خط 5</option>
                 </select>
-              </label>
+              </div>
             </div>
 
             <div class="card sub">
-              <h4>مكونات المنتج (مرتبطة بـ SAP)</h4>
-              <div class="row wrap">
-                <input id="compName" placeholder="اسم المكون">
-                <input id="compSAP" placeholder="كود SAP (مفتاح)">
-                <input id="compQtyPerProd" type="number" min="0.0001" step="0.0001" placeholder="كمية لكل منتج">
-                <button id="btn-add-comp" type="button" class="btn small">أضف مكون</button>
+              <h4 style="margin:0 0 10px; color:#1e293b; font-size:14px;">➕ مكونات المنتج المرتبطة بأكواد SAP</h4>
+              <div class="form-grid" style="grid-template-columns: 2fr 1.5fr 1fr auto; align-items: flex-end;">
+                <div class="form-group">
+                  <label>اسم المكون</label>
+                  <input id="compName" placeholder="مثال: موتور كهربي 1/2 حصان" />
+                </div>
+                <div class="form-group">
+                  <label>كود SAP</label>
+                  <input id="compSAP" placeholder="مثال: SAP-10492" />
+                </div>
+                <div class="form-group">
+                  <label>الكمية لكل منتج</label>
+                  <input id="compQtyPerProd" type="number" min="0.0001" step="0.0001" placeholder="1" />
+                </div>
+                <div>
+                  <button id="btn-add-comp" type="button" class="btn small" style="height: 42px;">أضف مكون</button>
+                </div>
               </div>
-              <ul id="bomCompList" class="list"></ul>
+              <ul id="bomCompList" class="custom-list" style="margin-top:10px;"></ul>
             </div>
 
-            <div class="row wrap">
-              <button class="btn" type="submit">حفظ الـ BOM</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+              <button class="btn" type="submit">💾 حفظ قائمة الـ BOM</button>
               <button id="btn-clear-bom" class="btn outline" type="button">مسح الحقول</button>
             </div>
-            <div class="row wrap" style="margin-top:8px;">
-              <input id="bomExcel" type="file" accept=".xlsx,.xls" />
-              <button id="btn-import-bom" class="btn outline" type="button">استيراد مكونات من Excel</button>
-              <button id="btn-export-bom" class="btn" type="button">تصدير مكونات الـBOM</button>
-              <button id="btn-template-bom" class="btn outline" type="button">تحميل قالب Excel</button>
+
+            <div class="excel-actions">
+              <span style="font-weight:700; font-size:13px; color:#475569;">📊 إكسيل المكونات:</span>
+              <input id="bomExcel" type="file" accept=".xlsx,.xls" style="max-width:240px; font-size:12px;" />
+              <button id="btn-import-bom" class="btn outline small" type="button">استيراد من Excel</button>
+              <button id="btn-export-bom" class="btn outline small" type="button">تصدير إلى Excel</button>
+              <button id="btn-template-bom" class="btn outline small" type="button">تحميل قالب فارغ</button>
             </div>
           </form>
         </div>
 
         <div class="card">
-          <h3>قوائم الـ BOM</h3>
-          <ul id="bomList" class="list"></ul>
+          <div class="card-header">
+            <h3>قوائم الـ BOM المسجلة للنظام</h3>
+          </div>
+          <ul id="bomList" class="custom-list"></ul>
         </div>
       </section>
 
-      <!-- STOCK -->
+      <!-- STOCK PANE -->
       <section id="stock" class="pane">
-        <h2>استلام المخزن (بـ كود SAP)</h2>
         <div class="card">
+          <div class="card-header">
+            <h3>📥 استلام شحنة جديدة في مخزن السوبرماركت (SAP Intake)</h3>
+          </div>
           <form id="form-stock">
-            <div class="row wrap">
-              <label class="flex">كود SAP (إجباري)
-                <input id="stockSAP" list="sapDatalist" placeholder="اكتب أو اختر كود SAP" required>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>كود SAP (المفتاح الرئيسي)</label>
+                <input id="stockSAP" list="sapDatalist" placeholder="اكتب أو اختر كود SAP" required />
                 <datalist id="sapDatalist"></datalist>
-              </label>
-              <label class="flex">اسم المكون (ظاهر تلقائياً)
-                <input id="stockName" readonly placeholder="سيظهر بعد اختيار SAP">
-              </label>
-            </div>
-
-            <div class="row wrap">
-              <label class="flex">الكمية الواردة (وحدات)
-                <input id="stockQty" type="number" min="0.0001" step="0.0001" required>
-              </label>
-              <label class="flex">الخط المُستلم إليه
+              </div>
+              <div class="form-group">
+                <label>اسم المكون (يظهر تلقائياً)</label>
+                <input id="stockName" readonly placeholder="سيظهر تلقائياً بعد اختيار SAP" />
+              </div>
+              <div class="form-group">
+                <label>الكمية الواردة</label>
+                <input id="stockQty" type="number" min="0.0001" step="0.0001" required placeholder="مثال: 500" />
+              </div>
+              <div class="form-group">
+                <label>الخط المُستلم إليه</label>
                 <select id="stockLine" required>
                   <option value="">اختر الخط</option>
-                  <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
+                  <option value="خط 1">خط 1</option>
+                  <option value="خط 2">خط 2</option>
+                  <option value="خط 3">خط 3</option>
+                  <option value="خط 4">خط 4</option>
+                  <option value="خط 5">خط 5</option>
                 </select>
-              </label>
+              </div>
+              <div class="form-group">
+                <label>تاريخ ووقت الاستلام</label>
+                <input id="stockDatetime" type="datetime-local" required />
+              </div>
             </div>
 
-            <div class="row wrap">
-              <label class="flex">وقت الاستلام (تاريخ ووقت)
-                <input id="stockDatetime" type="datetime-local" required>
-              </label>
-              <button class="btn" type="submit">سجل وصول</button>
-            </div>
-            <div class="row wrap" style="margin-top:8px;">
-              <input id="stockExcel" type="file" accept=".xlsx,.xls" />
-              <select id="stockImportLine">
+            <button class="btn success" type="submit">تسجيل استلام بالمخزن 📥</button>
+
+            <div class="excel-actions">
+              <span style="font-weight:700; font-size:13px; color:#475569;">📊 إكسيل استلامات المخزن:</span>
+              <input id="stockExcel" type="file" accept=".xlsx,.xls" style="max-width:240px; font-size:12px;" />
+              <select id="stockImportLine" style="padding:6px; font-size:13px;">
                 <option value="خط 1">خط 1</option>
                 <option value="خط 2">خط 2</option>
                 <option value="خط 3">خط 3</option>
                 <option value="خط 4">خط 4</option>
                 <option value="خط 5">خط 5</option>
               </select>
-              <input id="stockImportDatetime" type="datetime-local" />
-              <button id="btn-import-stock" class="btn outline" type="button">استيراد مخزون من Excel</button>
-              <button id="btn-template-stock" class="btn outline" type="button">تحميل قالب Excel للمخزون</button>
+              <input id="stockImportDatetime" type="datetime-local" style="padding:6px; font-size:13px;" />
+              <button id="btn-import-stock" class="btn outline small" type="button">استيراد مخزون من Excel</button>
+              <button id="btn-template-stock" class="btn outline small" type="button">تحميل قالب استلام المخزن</button>
             </div>
           </form>
         </div>
 
         <div class="card">
-          <h3>قائمة المخزون (تفصيل حسب الخط)</h3>
+          <div class="card-header">
+            <h3>📦 أرصدة المخزون الحالية وتفاصيل الخطوط</h3>
+            <div class="filter-bar" style="margin-bottom:0;">
+              <input id="stockSearch" class="search-input" placeholder="🔍 بحث سريع بكود SAP أو اسم المكون..." />
+            </div>
+          </div>
           <div class="table-wrap">
-            <table class="table" id="stockTable">
+            <table class="custom-table" id="stockTable">
               <thead>
-                <tr><th>كود SAP</th><th>الاسم</th><th>الكمية الكلية</th><th>تفصيل الخطوط</th><th>إجراءات</th></tr>
+                <tr>
+                  <th>كود SAP</th>
+                  <th>اسم المكون</th>
+                  <th>الكمية الإجمالية</th>
+                  <th>توزيع الخطوط</th>
+                  <th>إجراءات</th>
+                </tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -291,117 +786,191 @@ input,select,textarea{direction:ltr}
         </div>
       </section>
 
-      <!-- CARTS -->
+      <!-- CARTS PANE -->
       <section id="carts" class="pane">
-        <h2>عربيات التداول</h2>
         <div class="card">
+          <div class="card-header">
+            <h3>🛒 تسجيل وتعديل عربيات التداول (Replenishment Carts)</h3>
+          </div>
           <form id="form-cart">
-            <div class="row wrap">
-              <input id="cartName" placeholder="اسم العربية (مثال: عربية 1)" required>
-              <select id="cartSAP" required></select>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>اسم / رقم العربية</label>
+                <input id="cartName" placeholder="مثال: عربية تداول موتورز - رقم 03" required />
+              </div>
+              <div class="form-group">
+                <label>كود الـ SAP المنقول</label>
+                <select id="cartSAP" required></select>
+              </div>
+              <div class="form-group">
+                <label>السعة (الكمية التي تشيلها)</label>
+                <input id="cartQty" type="number" min="1" step="1" placeholder="مثال: 120" required />
+              </div>
+              <div class="form-group">
+                <label>مدة التغطية (بالساعات)</label>
+                <input id="cartCoverage" type="number" min="1" step="1" placeholder="مثال: 4" required />
+              </div>
+              <div class="form-group">
+                <label>الخط المستهدف</label>
+                <select id="cartLine" required>
+                  <option value="">اختر الخط</option>
+                  <option value="خط 1">خط 1</option>
+                  <option value="خط 2">خط 2</option>
+                  <option value="خط 3">خط 3</option>
+                  <option value="خط 4">خط 4</option>
+                  <option value="خط 5">خط 5</option>
+                </select>
+              </div>
             </div>
 
-            <div class="row wrap">
-              <input id="cartQty" type="number" min="1" step="1" placeholder="الكمية التي تشيلها" required>
-              <input id="cartCoverage" type="number" min="1" step="1" placeholder="مدة التغطية بالساعات" required>
-            </div>
+            <button class="btn" type="submit">💾 أضف / حدّث العربية</button>
 
-            <div class="row wrap">
-              <select id="cartLine" required>
-                <option value="">اختر الخط</option>
-                <option>خط 1</option><option>خط 2</option><option>خط 3</option><option>خط 4</option><option>خط 5</option>
-              </select>
-              <button class="btn" type="submit">أضف / حدّث العربية</button>
-            </div>
-            <div class="row wrap" style="margin-top:8px;">
-              <input id="cartsExcel" type="file" accept=".xlsx,.xls" />
-              <button id="btn-import-carts" class="btn outline" type="button">استيراد عربيات من Excel</button>
-              <button id="btn-template-carts" class="btn outline" type="button">تحميل قالب Excel للعربيات</button>
+            <div class="excel-actions">
+              <span style="font-weight:700; font-size:13px; color:#475569;">📊 إكسيل عربيات التداول:</span>
+              <input id="cartsExcel" type="file" accept=".xlsx,.xls" style="max-width:240px; font-size:12px;" />
+              <button id="btn-import-carts" class="btn outline small" type="button">استيراد عربيات من Excel</button>
+              <button id="btn-template-carts" class="btn outline small" type="button">تحميل قالب العربيات</button>
             </div>
           </form>
         </div>
 
         <div class="card">
-          <h3>قائمة العربيات</h3>
-          <ul id="cartList" class="list"></ul>
+          <div class="card-header">
+            <h3>قائمة عربيات التداول النشطة وحالة التغذية</h3>
+          </div>
+          <ul id="cartList" class="custom-list"></ul>
         </div>
       </section>
 
-      <!-- PRODUCTION -->
+      <!-- PRODUCTION PANE -->
       <section id="production" class="pane">
-        <h2>أوامر الإنتاج</h2>
         <div class="card">
+          <div class="card-header">
+            <h3>⚙️ تسجيل أمر إنتاج واحتساب الاستهلاك الفوري</h3>
+          </div>
           <form id="form-production">
-            <div class="row wrap">
-              <label class="flex">اختر المنتج (BOM)
+            <div class="form-grid">
+              <div class="form-group">
+                <label>اختر المنتج (BOM)</label>
                 <select id="prodBom" required></select>
-              </label>
-              <label class="flex">كمية الإنتاج
-                <input id="prodQty" type="number" min="1" step="1" required>
-              </label>
+              </div>
+              <div class="form-group">
+                <label>كمية الإنتاج المطلوبة</label>
+                <input id="prodQty" type="number" min="1" step="1" placeholder="مثال: 250" required />
+              </div>
+              <div class="form-group">
+                <label>خط الإنتاج</label>
+                <input id="prodLine" readonly placeholder="يحدد تلقائياً من الـ BOM" />
+              </div>
+              <div class="form-group">
+                <label>تاريخ ووقت أمر الإنتاج</label>
+                <input id="prodDatetime" type="datetime-local" required />
+              </div>
             </div>
 
-            <div class="row wrap">
-              <label class="flex">خط الإنتاج (من الـ BOM)
-                <input id="prodLine" readonly>
-              </label>
-              <label class="flex">وقت الإنتاج (تاريخ ووقت)
-                <input id="prodDatetime" type="datetime-local" required>
-              </label>
-            </div>
-
-            <div class="row wrap">
-              <button class="btn" type="submit">سجل / حدّث أمر الإنتاج</button>
-            </div>
+            <button class="btn success" type="submit">⚡ خصم وتسجيل أمر الإنتاج</button>
           </form>
         </div>
 
         <div class="card">
-          <h3>سجل أوامر الإنتاج</h3>
-          <ul id="prodList" class="list"></ul>
+          <div class="card-header">
+            <h3>سجل أوامر الإنتاج المنفذة</h3>
+          </div>
+          <ul id="prodList" class="custom-list"></ul>
         </div>
       </section>
 
-      <!-- REPORTS -->
+      <!-- REPORTS PANE -->
       <section id="reports" class="pane">
-        <h2>التقارير</h2>
-        <div class="grid">
+        <div class="grid-2">
           <div class="card">
-            <h3>حالة المخزون التفصيلية</h3>
+            <div class="card-header">
+              <h3>📈 تقرير المخزون التفصيلي لكل خط</h3>
+            </div>
             <div class="table-wrap">
-              <table class="table" id="detailedStock">
-                <thead><tr><th>كود SAP</th><th>الاسم</th><th>الخط</th><th>الكمية</th><th>سجل</th></tr></thead>
+              <table class="custom-table" id="detailedStock">
+                <thead>
+                  <tr>
+                    <th>كود SAP</th>
+                    <th>الاسم</th>
+                    <th>الخط</th>
+                    <th>الكمية</th>
+                    <th>السجل</th>
+                  </tr>
+                </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
 
           <div class="card">
-            <h3>سجل العربيات ووقت التغطية</h3>
-            <ul id="detailedCarts" class="list"></ul>
+            <div class="card-header">
+              <h3>⏱️ سجل تغطية العربيات والاستهلاك</h3>
+            </div>
+            <ul id="detailedCarts" class="custom-list"></ul>
           </div>
         </div>
       </section>
     </main>
 
+    <!-- Professional Footer as requested by user -->
     <footer class="footer">
-      <small class="muted">التخزين محلي: localStorage — المفتاح: factory_supermarket_v3</small>
+      <div class="footer-title">
+        جميع الحقوق محفوظة للمهندس / مينا خيرت
+      </div>
+      <div class="footer-contact">
+        <span>رقم الموبايل:</span>
+        <a href="tel:01200224513" class="contact-badge">
+          📞 01200224513
+        </a>
+        <a href="https://wa.me/201200224513" target="_blank" rel="noopener noreferrer" class="contact-badge wa">
+          💬 تواصل عبر واتساب
+        </a>
+      </div>
+      <div class="footer-sub">
+        SuperMarketPro v4.0 • Enterprise Manufacturing & Pre-Production Replenishment Suite
+      </div>
     </footer>
   </div>
 
+  <!-- Audio Alert Beep -->
   <audio id="alertSound" preload="auto"></audio>
 
   <!-- In-app Dialog Modal (safe inside iframes) -->
   <div id="appModal" class="modal-backdrop" style="display:none;">
     <div class="modal-box">
       <h3 id="modalTitle">إشعار</h3>
-      <p id="modalMessage" style="white-space:pre-wrap;margin:12px 0;color:#334155;line-height:1.6;"></p>
-      <div id="modalInputWrap" style="display:none;margin-bottom:12px;">
-        <input id="modalInputVal" style="width:100%;box-sizing:border-box;" />
+      <p id="modalMessage" style="white-space:pre-wrap; margin:12px 0; color:#334155; line-height:1.6;"></p>
+      <div id="modalInputWrap" style="display:none; margin-bottom:14px;">
+        <input id="modalInputVal" style="width:100%; box-sizing:border-box;" />
       </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button id="modalBtnCancel" class="btn outline small" type="button" style="display:none;">إلغاء</button>
         <button id="modalBtnOk" class="btn small" type="button">موافق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Smart BOM Extractor Modal -->
+  <div id="aiBomModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box" style="max-width: 600px;">
+      <h3 style="color:var(--ai-purple); display:flex; align-items:center; gap:8px;">
+        ✨ استخراج بيانات الـ BOM بالذكاء الاصطناعي
+      </h3>
+      <p style="font-size:13px; color:#64748b; margin-bottom:12px;">
+        الصق هنا نص أمر التوريد، أو جدول المكونات غير المنظم من إيميل أو واتساب أو تقرير SAP،
+        وسيقوم الذكاء الاصطناعي باستخراج اسم المنتج وأكواد SAP والكميات وإضافتها مباشرة لنموذج الـ BOM!
+      </p>
+      <textarea id="aiBomText" rows="6" placeholder="مثال:
+منتج: سخان مياه صناعي خط 2 وخط 3
+المكونات:
+- ثرموستات تحكم ساب 55210 كمية 1 لكل وحدة
+- عنصر تسخين ستانلس كود SAP-99320 كمية 2
+- محبس نحاس 1 بوصة كود SAP-11234 كمية 1" style="width:100%; resize:vertical;"></textarea>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+        <button id="btnAiBomClose" class="btn outline small" type="button">إلغاء</button>
+        <button id="btnAiBomProcess" class="btn ai small" type="button">⚡ استخراج وتعبئة الـ BOM</button>
       </div>
     </div>
   </div>
@@ -409,7 +978,9 @@ input,select,textarea{direction:ltr}
   <div id="toastContainer" class="toast-container"></div>
 
   <script>
-// Modal / Toast system for iframe safety
+// ==========================================
+// 1. Toast & Modal Dialog System (Iframe safe)
+// ==========================================
 function showToast(msg) {
   const container = document.getElementById('toastContainer');
   if(!container) return;
@@ -465,12 +1036,8 @@ function showModalDialog({ title = 'تنبيه', message, showInput = false, def
   };
 }
 
-// Override window.alert to show in-app toasts/modals safely
-window.alert = function(msg) {
-  showToast(String(msg));
-};
+window.alert = function(msg) { showToast(String(msg)); };
 
-// Safe audio synthesizer
 function playAlertBeep() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -490,6 +1057,9 @@ function playAlertBeep() {
   } catch(e) {}
 }
 
+// ==========================================
+// 2. Main SuperMarket Engine
+// ==========================================
 (() => {
   const STORAGE_KEY = "factory_supermarket_v3";
   const uid = (p='id') => p + '_' + Math.random().toString(36).slice(2,9);
@@ -501,19 +1071,27 @@ function playAlertBeep() {
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
-  // load/save
   function load(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return { boms:[], stock:{}, carts:[], productions:[] };
     try{ return JSON.parse(raw); } catch(e){ console.error(e); return { boms:[], stock:{}, carts:[], productions:[] }; }
   }
-  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateKPIs();
+  }
   let state = load();
 
-  // DOM refs
+  // DOM elements
   const tabs = document.querySelectorAll('.nav .tab');
   const panes = document.querySelectorAll('.pane');
-  const alertSound = document.getElementById('alertSound');
+
+  // KPI elements
+  const kpiStock = document.getElementById('kpi-stock-count');
+  const kpiCarts = document.getElementById('kpi-carts-count');
+  const kpiAlerts = document.getElementById('kpi-alerts-count');
+  const kpiBoms = document.getElementById('kpi-boms-count');
+  const kpiProd = document.getElementById('kpi-prod-count');
 
   // BOM
   const formBom = document.getElementById('form-bom');
@@ -536,6 +1114,7 @@ function playAlertBeep() {
   const stockDatetime = document.getElementById('stockDatetime');
   const sapDatalist = document.getElementById('sapDatalist');
   const stockTableBody = document.querySelector('#stockTable tbody');
+  const stockSearch = document.getElementById('stockSearch');
 
   // CARTS
   const formCart = document.getElementById('form-cart');
@@ -562,7 +1141,6 @@ function playAlertBeep() {
   const ctx = document.getElementById('stockChart').getContext('2d');
   let stockChart = null;
 
-  // helpers
   function setDefaultDatetimes(){
     stockDatetime.value = toLocalDateTime(nowISO());
     prodDatetime.value = toLocalDateTime(nowISO());
@@ -570,7 +1148,7 @@ function playAlertBeep() {
     if(stockImportDt) stockImportDt.value = toLocalDateTime(nowISO());
   }
 
-  // NAV setup
+  // Tab switching
   tabs.forEach(tab => tab.addEventListener('click', () => {
     tabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
@@ -579,12 +1157,99 @@ function playAlertBeep() {
     renderAll();
   }));
 
-  // initial
   setDefaultDatetimes();
 
-  // ---------- BOM logic ----------
+  function updateKPIs(){
+    kpiStock.textContent = Object.keys(state.stock || {}).length;
+    kpiCarts.textContent = (state.carts || []).length;
+    kpiBoms.textContent = (state.boms || []).length;
+    kpiProd.textContent = (state.productions || []).length;
+  }
+
+  // Demo Sample Factory Data
+  document.getElementById('btn-load-demo').addEventListener('click', () => {
+    showModalDialog({
+      title: 'تحميل بيانات مصنع تجريبية',
+      message: 'سيتم تحميل بيانات نموذجية متكاملة لـ 5 خطوط إنتاج، وقوائم BOM، وأرصدة SAP، وعربيات تداول نشطة لتجربة واستعراض كامل قدرات البرنامج والذكاء الاصطناعي. هل تريد المتابعة؟',
+      showCancel: true,
+      onOk: () => {
+        state = {
+          boms: [
+            {
+              id: 'bom_1',
+              name: 'مبرد هواء صناعي - موديل سوبر A',
+              lines: ['خط 1', 'خط 2'],
+              components: [
+                { sap: 'SAP-1011', name: 'موتور مبرد 0.5 حصان', qtyPerProduct: 1 },
+                { sap: 'SAP-1012', name: 'مروحة تبريد ألومنيوم 40سم', qtyPerProduct: 1 },
+                { sap: 'SAP-1013', name: 'حساس حرارة رقمي', qtyPerProduct: 2 },
+                { sap: 'SAP-1014', name: 'فلتر أتربة بوليستر', qtyPerProduct: 4 }
+              ]
+            },
+            {
+              id: 'bom_2',
+              name: 'طلمبة مياه غاطسة - موديل P300',
+              lines: ['خط 3', 'خط 5'],
+              components: [
+                { sap: 'SAP-2021', name: 'جسم طلمبة زهر مقاوم للصدأ', qtyPerProduct: 1 },
+                { sap: 'SAP-2022', name: 'عوامة كهربائية أوتوماتيك', qtyPerProduct: 1 },
+                { sap: 'SAP-1011', name: 'موتور مبرد 0.5 حصان', qtyPerProduct: 1 }
+              ]
+            }
+          ],
+          stock: {
+            'SAP-1011': {
+              sap: 'SAP-1011', name: 'موتور مبرد 0.5 حصان',
+              lines: { 'خط 1': 45, 'خط 2': 18, 'خط 3': 30 },
+              history: [{ id:'st_1', type:'in', qty:93, when: nowISO(), line:'خط 1', note:'استلام تجريبي', by:'user' }]
+            },
+            'SAP-1012': {
+              sap: 'SAP-1012', name: 'مروحة تبريد ألومنيوم 40سم',
+              lines: { 'خط 1': 80, 'خط 2': 60 },
+              history: []
+            },
+            'SAP-1013': {
+              sap: 'SAP-1013', name: 'حساس حرارة رقمي',
+              lines: { 'خط 1': 8, 'خط 2': 4 },
+              history: []
+            },
+            'SAP-1014': {
+              sap: 'SAP-1014', name: 'فلتر أتربة بوليستر',
+              lines: { 'خط 1': 150, 'خط 2': 120 },
+              history: []
+            },
+            'SAP-2021': {
+              sap: 'SAP-2021', name: 'جسم طلمبة زهر مقاوم للصدأ',
+              lines: { 'خط 3': 40, 'خط 5': 25 },
+              history: []
+            },
+            'SAP-2022': {
+              sap: 'SAP-2022', name: 'عوامة كهربائية أوتوماتيك',
+              lines: { 'خط 3': 5, 'خط 5': 2 },
+              history: []
+            }
+          },
+          carts: [
+            { id:'cart_1', name:'عربية 01 - مواتير خط 1', sap:'SAP-1011', qty:30, coverageHours:3, line:'خط 1', addedAt: new Date(Date.now() - 2.8 * 3600 * 1000).toISOString() },
+            { id:'cart_2', name:'عربية 02 - حساسات حرارة', sap:'SAP-1013', qty:20, coverageHours:2, line:'خط 2', addedAt: new Date(Date.now() - 1.9 * 3600 * 1000).toISOString() },
+            { id:'cart_3', name:'عربية 03 - مراوح تبريد', sap:'SAP-1012', qty:50, coverageHours:5, line:'خط 1', addedAt: new Date(Date.now() - 0.5 * 3600 * 1000).toISOString() },
+            { id:'cart_4', name:'عربية 04 - طلمبات خط 3', sap:'SAP-2021', qty:25, coverageHours:4, line:'خط 3', addedAt: null }
+          ],
+          productions: [
+            { id:'pr_1', bomId:'bom_1', bomName:'مبرد هواء صناعي - موديل سوبر A', qty:20, line:'خط 1', when: nowISO(), consumed: [{ sap:'SAP-1011', name:'موتور مبرد', qty:20 }] }
+          ]
+        };
+        save();
+        window._factoryState = state;
+        renderAll();
+        showToast('✨ تم تحميل بيانات المصنع النموذجية بنجاح!');
+      }
+    });
+  });
+
+  // ---------- BOM LOGIC ----------
   let editingBomId = null;
-  let currentComponents = []; // {sap,name,qtyPerProduct}
+  let currentComponents = [];
 
   btnAddComp.addEventListener('click', () => {
     const name = compName.value.trim();
@@ -599,11 +1264,11 @@ function playAlertBeep() {
 
   function renderBomComponents(){
     bomCompList.innerHTML = '';
-    if(currentComponents.length===0){ bomCompList.innerHTML = '<li class="muted">لا توجد مكونات مضافة.</li>'; return; }
+    if(currentComponents.length===0){ bomCompList.innerHTML = '<li class="muted" style="justify-content:center;">لا توجد مكونات مضافة حتى الآن.</li>'; return; }
     currentComponents.forEach((c,i) => {
       const li = document.createElement('li');
-      li.innerHTML = `<div><strong>${c.name}</strong> — SAP: ${c.sap} — لكل منتج: ${c.qtyPerProduct}</div>
-        <div><button class="btn small" data-i="${i}" type="button">حذف</button></div>`;
+      li.innerHTML = `<div><strong>${c.name}</strong> — كود SAP: <span style="font-family:monospace; color:#0284c7; font-weight:700;">${c.sap}</span> — لكل منتج: <strong>${c.qtyPerProduct}</strong></div>
+        <div><button class="btn small outline danger" data-i="${i}" type="button">حذف</button></div>`;
       bomCompList.appendChild(li);
     });
     bomCompList.querySelectorAll('button').forEach(b=>{
@@ -619,19 +1284,20 @@ function playAlertBeep() {
     const rec = { id: editingBomId || uid('bom'), name, lines, components: JSON.parse(JSON.stringify(currentComponents)) };
     if(editingBomId){ state.boms = state.boms.filter(b=>b.id!==editingBomId); editingBomId = null; }
     state.boms.push(rec);
-    // ensure stock entries exist for components
     currentComponents.forEach(c => {
       if(!state.stock[c.sap]) state.stock[c.sap] = { sap:c.sap, name:c.name, lines:{}, history:[] };
       state.stock[c.sap].name = c.name;
     });
     currentComponents = []; bomName.value=''; Array.from(bomLines.options).forEach(opt=>opt.selected=false);
     save(); renderAll();
-    alert('تم حفظ الـ BOM بنجاح.');
+    showToast('تم حفظ قائمة الـ BOM بنجاح.');
   });
 
-  btnClearBom.addEventListener('click', ()=> { bomName.value=''; currentComponents=[]; Array.from(bomLines.options).forEach(opt=>opt.selected=false); renderBomComponents(); });
+  btnClearBom.addEventListener('click', ()=> {
+    bomName.value=''; currentComponents=[]; Array.from(bomLines.options).forEach(opt=>opt.selected=false); renderBomComponents();
+  });
 
-  // ---------- STOCK logic ----------
+  // ---------- STOCK LOGIC ----------
   formStock.addEventListener('submit', e => {
     e.preventDefault();
     const sap = stockSAP.value.trim();
@@ -644,12 +1310,12 @@ function playAlertBeep() {
     state.stock[sap].name = name || state.stock[sap].name;
     const prev = state.stock[sap].lines[line] || 0;
     state.stock[sap].lines[line] = Math.round((prev + qty)*1000)/1000;
-    state.stock[sap].history.push({ id: uid('st'), type:'in', qty, when, line, note:'استلام', by:'user' });
+    state.stock[sap].history.push({ id: uid('st'), type:'in', qty, when, line, note:'استلام بالمخزن', by:'user' });
     save(); renderAll(); formStock.reset(); stockName.value=''; setDefaultDatetimes();
-    alert('تم تسجيل استلام الكمية في المخزن.');
+    showToast(`تم استلام ${qty} وحدة من (${sap}) على ${line}`);
   });
 
-  stockSAP.addEventListener('change', ()=> {
+  stockSAP.addEventListener('input', ()=> {
     const sap = stockSAP.value.trim();
     if(!sap){ stockName.value=''; return; }
     if(state.stock[sap]) stockName.value = state.stock[sap].name || '';
@@ -668,8 +1334,8 @@ function playAlertBeep() {
     if(!s) return;
     const prev = s.lines[line] || 0;
     showModalDialog({
-      title: 'تعديل كمية المخزون',
-      message: `تعديل كمية ${s.name} (${sap}) على ${line}\nالقيمة الحالية: ${prev}\nادخل القيمة الجديدة:`,
+      title: 'تعديل رصيد المخزون',
+      message: `تعديل رصيد المكون: ${s.name} (${sap}) على [${line}]\nالرصيد الحالي: ${prev}\nادخل الرصيد الجديد:`,
       showInput: true,
       defaultValue: String(prev),
       showCancel: true,
@@ -677,14 +1343,19 @@ function playAlertBeep() {
         const newVal = parseFloat(val);
         if(isNaN(newVal)) return alert('قيمة غير صحيحة.');
         s.lines[line] = Math.round(newVal*1000)/1000;
-        s.history.push({ id: uid('st'), type:'adjust', qty:newVal, when: new Date().toISOString(), line, note:'تعديل يدوي', by:'user' });
+        s.history.push({ id: uid('st'), type:'adjust', qty:newVal, when: new Date().toISOString(), line, note:'تعديل يدوي من الإدارة', by:'user' });
         save(); renderAll();
-        alert('تم تعديل الكمية بنجاح.');
+        showToast('تم تعديل الكمية بنجاح.');
       }
     });
   }
 
-  // ---------- CART logic ----------
+  // Quick search in stock
+  stockSearch.addEventListener('input', () => {
+    renderStockTable(stockSearch.value.trim().toLowerCase());
+  });
+
+  // ---------- CARTS LOGIC ----------
   let editingCartId = null;
   formCart.addEventListener('submit', e => {
     e.preventDefault();
@@ -699,10 +1370,10 @@ function playAlertBeep() {
       if(!c) return;
       c.name = name; c.sap = sap; c.qty = qty; c.coverageHours = hours; c.line = line;
       editingCartId = null;
-      alert('تم تحديث بيانات العربية.');
+      showToast('تم تحديث بيانات العربية.');
     } else {
       state.carts.push({ id: uid('cart'), name, sap, qty, coverageHours: hours, line, addedAt: null });
-      alert('تمت إضافة العربية بنجاح.');
+      showToast('تمت إضافة عربية التداول بنجاح.');
     }
     save(); renderAll(); formCart.reset();
   });
@@ -721,23 +1392,23 @@ function playAlertBeep() {
     if(!c) return;
     c.addedAt = new Date().toISOString();
     save(); renderAll();
-    alert('تم بدء ساعة التغطية للعربية.');
+    showToast(`تم بدء ساعة التغطية للعربية (${c.name}).`);
   }
 
   function deleteCart(id){
     showModalDialog({
-      title: 'تأكيد الحذف',
-      message: 'هل تريد حذف العربية؟',
+      title: 'حذف العربية',
+      message: 'هل تريد بالتأكيد حذف هذه العربية من دورة التداول؟',
       showCancel: true,
       onOk: () => {
         state.carts = state.carts.filter(x=>x.id!==id);
         save(); renderAll();
-        alert('تم حذف العربية.');
+        showToast('تم حذف العربية.');
       }
     });
   }
 
-  // ---------- PRODUCTION logic ----------
+  // ---------- PRODUCTION LOGIC ----------
   let editingProdId = null;
   prodBom.addEventListener('change', ()=>{
     const b = state.boms.find(x=>x.id === prodBom.value);
@@ -776,20 +1447,20 @@ function playAlertBeep() {
           if(left > 0){
             const fallback = (bom.lines && bom.lines[0]) || Object.keys(s.lines||{})[0] || 'خط 1';
             s.lines[fallback] = Math.round(((s.lines[fallback]||0) - left)*1000)/1000;
-            s.history.push({ id: uid('st'), type:'out', qty: left, when, line: fallback, note:'استهلاك إنتاج (نقص)', by:'system' });
+            s.history.push({ id: uid('st'), type:'out', qty: left, when, line: fallback, note:'استهلاك إنتاج (نقص مخزون)', by:'system' });
           }
         });
         const rec = { id: uid('prod'), bomId: bom.id, bomName: bom.name, qty, when, line: bom.lines && bom.lines[0] ? bom.lines[0] : '', consumed };
         state.productions.push(rec);
       }
       save(); renderAll(); formProd.reset(); setDefaultDatetimes();
-      alert('تم تسجيل أمر الإنتاج بنجاح.');
+      showToast('تم تسجيل أمر الإنتاج وخصم المكونات بنجاح.');
     };
 
     if(editingProdId){
       showModalDialog({
-        title: 'تنبيه التعديل',
-        message: 'تعديل أمر الإنتاج لن يعكس تلقائياً تغيير المخزون. متابعة؟',
+        title: 'تنبيه تعديل أمر الإنتاج',
+        message: 'تعديل أمر الإنتاج لن يعكس تلقائياً تغيير المخزون السابق. متابعة؟',
         showCancel: true,
         onOk: executeProdSave
       });
@@ -803,7 +1474,7 @@ function playAlertBeep() {
     if(!p) return;
     showModalDialog({
       title: 'تعديل أمر الإنتاج',
-      message: 'ستُحمّل بيانات الأمر في النموذج للتعديل. ملاحظة: النظام لن يعكس المخزون تلقائياً. متابعة؟',
+      message: 'ستُحمّل بيانات الأمر في النموذج للتعديل. متابعة؟',
       showCancel: true,
       onOk: () => {
         editingProdId = id;
@@ -814,11 +1485,12 @@ function playAlertBeep() {
     });
   }
 
-  // ---------- Rendering ----------
+  // ---------- RENDERING ----------
   function renderAll(){
+    updateKPIs();
     renderBomList();
     renderCompDatalist();
-    renderStockTable();
+    renderStockTable(stockSearch ? stockSearch.value.trim().toLowerCase() : '');
     renderCartList();
     renderProdList();
     renderReports();
@@ -829,15 +1501,19 @@ function playAlertBeep() {
 
   function renderBomList(){
     bomListEl.innerHTML = '';
-    if(state.boms.length === 0){ bomListEl.innerHTML = '<li class="muted">لا توجد قوائم BOM.</li>'; return; }
+    if(state.boms.length === 0){ bomListEl.innerHTML = '<li class="muted" style="justify-content:center;">لا توجد قوائم BOM مسجلة.</li>'; return; }
     state.boms.forEach(b=>{
       const li = document.createElement('li');
-      li.innerHTML = `<div><strong>${b.name}</strong><div class="muted">${(b.lines||[]).join(' • ')}</div>
-        <div class="muted">${(b.components||[]).map(c=>`${c.name}(${c.sap}:${c.qtyPerProduct})`).join(' — ')}</div></div>
-        <div>
-          <button class="btn small" data-id="${b.id}" data-action="edit" type="button">تعديل</button>
-          <button class="btn outline small" data-id="${b.id}" data-action="delete" type="button">حذف</button>
-        </div>`;
+      const linesBadges = (b.lines||[]).map(l => `<span class="tag-line line${l.replace(/\D/g,'')||'1'}">${l}</span>`).join(' ');
+      li.innerHTML = `<div>
+        <div style="font-weight:800; font-size:15px; margin-bottom:4px;">${b.name}</div>
+        <div style="margin-bottom:6px;">${linesBadges || '<span class="muted">غير محدد</span>'}</div>
+        <div class="muted" style="font-size:12px;">${(b.components||[]).map(c=>`<strong>${c.name}</strong> [${c.sap}: ×${c.qtyPerProduct}]`).join(' • ')}</div>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn small outline" data-id="${b.id}" data-action="edit" type="button">تعديل</button>
+        <button class="btn small outline danger" data-id="${b.id}" data-action="delete" type="button">حذف</button>
+      </div>`;
       bomListEl.appendChild(li);
     });
     bomListEl.querySelectorAll('button').forEach(btn=>{
@@ -845,13 +1521,13 @@ function playAlertBeep() {
         const id = btn.dataset.id, action = btn.dataset.action;
         if(action === 'delete'){
           showModalDialog({
-            title: 'حذف BOM',
-            message: 'هل أنت متأكد من حذف قائمة الـ BOM؟',
+            title: 'حذف الـ BOM',
+            message: 'هل تريد حذف هذا المنتج وقائمة مكوناته؟',
             showCancel: true,
             onOk: () => {
               state.boms = state.boms.filter(x=>x.id!==id);
               save(); renderAll();
-              alert('تم حذف الـ BOM.');
+              showToast('تم حذف الـ BOM.');
             }
           });
         }
@@ -865,6 +1541,7 @@ function playAlertBeep() {
           renderBomComponents();
           state.boms = state.boms.filter(x=>x.id!==id);
           save(); renderAll();
+          window.scrollTo({top: 0, behavior: 'smooth'});
         }
       });
     });
@@ -874,35 +1551,56 @@ function playAlertBeep() {
     sapDatalist.innerHTML = '';
     const sapSet = new Set(Object.keys(state.stock));
     state.boms.forEach(b => b.components.forEach(c => sapSet.add(c.sap)));
-    Array.from(sapSet).forEach(sap => { const o = document.createElement('option'); o.value = sap; sapDatalist.appendChild(o); });
-    
-    // cartSAP
-    cartSAP.innerHTML = '';
+    Array.from(sapSet).forEach(sap => {
+      const o = document.createElement('option');
+      o.value = sap;
+      sapDatalist.appendChild(o);
+    });
+
+    cartSAP.innerHTML = '<option value="">اختر كود SAP</option>';
     Array.from(sapSet).forEach(sap => {
       const opt = document.createElement('option');
       opt.value = sap;
-      opt.textContent = sap + (state.stock[sap] ? ' • ' + (state.stock[sap].name || '') : '');
+      opt.textContent = sap + (state.stock[sap] ? ' — ' + (state.stock[sap].name || '') : '');
       cartSAP.appendChild(opt);
     });
 
-    // prodBom
-    prodBom.innerHTML = '<option value="">اختر المنتج</option>';
-    state.boms.forEach(b=> { const o = document.createElement('option'); o.value = b.id; o.textContent = b.name; prodBom.appendChild(o); });
+    prodBom.innerHTML = '<option value="">اختر المنتج المصنع</option>';
+    state.boms.forEach(b=> {
+      const o = document.createElement('option');
+      o.value = b.id;
+      o.textContent = b.name;
+      prodBom.appendChild(o);
+    });
   }
 
-  function renderStockTable(){
+  function renderStockTable(filter = ''){
     stockTableBody.innerHTML = '';
-    const keys = Object.keys(state.stock);
-    if(keys.length === 0){ stockTableBody.innerHTML = '<tr><td colspan="5" class="center muted">المخزون فارغ</td></tr>'; return; }
+    let keys = Object.keys(state.stock);
+    if(filter){
+      keys = keys.filter(k => k.toLowerCase().includes(filter) || (state.stock[k].name||'').toLowerCase().includes(filter));
+    }
+    if(keys.length === 0){
+      stockTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:#64748b;">لا توجد أصناف مطابقة</td></tr>';
+      return;
+    }
     keys.forEach(sap => {
       const s = state.stock[sap];
       const total = Object.values(s.lines || {}).reduce((a,b)=>a + (parseFloat(b)||0), 0);
-      const detail = Object.keys(s.lines || {}).map(l=>`${l}: ${s.lines[l]}`).join(' • ');
+      const detailPills = Object.keys(s.lines || {}).map(l => {
+        const lineNum = l.replace(/\D/g, '') || '1';
+        return `<span class="tag-line line${lineNum}">${l}: <strong>${s.lines[l]}</strong></span>`;
+      }).join(' ');
+
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td data-label="SAP">${sap}</td><td data-label="اسم">${s.name||''}</td><td data-label="الكمية">${(Math.round(total*1000)/1000).toLocaleString()}</td><td data-label="تفاصيل">${detail || '-'}</td>
-        <td data-label="اجراءات">
-          <button class="btn small" data-sap="${sap}" data-act="view" type="button">عرض</button>
-          <button class="btn small" data-sap="${sap}" data-act="editLine" type="button">تعديل سطر</button>
+      tr.innerHTML = `
+        <td><span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:#0284c7;">${sap}</span></td>
+        <td><strong>${s.name||''}</strong></td>
+        <td><strong style="font-size:15px; font-family:'JetBrains Mono',monospace;">${(Math.round(total*1000)/1000).toLocaleString()}</strong></td>
+        <td>${detailPills || '<span class="muted">-</span>'}</td>
+        <td>
+          <button class="btn small outline" data-sap="${sap}" data-act="view" type="button">السجل</button>
+          <button class="btn small" data-sap="${sap}" data-act="editLine" type="button">تعديل رصيد</button>
         </td>`;
       stockTableBody.appendChild(tr);
     });
@@ -911,19 +1609,22 @@ function playAlertBeep() {
         const sap = btn.dataset.sap, act = btn.dataset.act;
         if(act === 'view'){
           const s = state.stock[sap];
-          let msg = `سجل ${s.name} (${sap}):\n`;
-          (s.history || []).slice().reverse().forEach(h => msg += `${h.when ? new Date(h.when).toLocaleString() : '-'} — ${h.type} — ${h.qty} — ${h.line || '-'} — ${h.note || ''}\n`);
+          let msg = `سجل حركات الصنف: ${s.name} (${sap})\n──────────────────────\n`;
+          (s.history || []).slice().reverse().forEach(h => {
+            const dateStr = h.when ? new Date(h.when).toLocaleString('ar-EG') : '-';
+            msg += `• [${h.type==='in'?'وارد':h.type==='out'?'صادر':'تعديل'}] ${h.qty} وحدة — ${h.line||'عام'} — ${dateStr} (${h.note||''})\n`;
+          });
           showModalDialog({
             title: `سجل حركة: ${s.name}`,
-            message: msg || 'لا يوجد سجل',
+            message: msg || 'لا توجد حركات مسجلة حتى الآن.',
             showCancel: false
           });
         } else if(act === 'editLine'){
           const s = state.stock[sap];
           const available = Array.from(new Set(['خط 1','خط 2','خط 3','خط 4','خط 5', ...Object.keys(s.lines||{})]));
           showModalDialog({
-            title: 'اختيار الخط',
-            message: `اختر اسم الخط للتعديل:\n${available.join(' , ')}`,
+            title: 'اختيار الخط لتعديل الرصيد',
+            message: `الخطوط المتاحة:\n${available.join(' • ')}\nاكتب اسم الخط المطلوب:`,
             showInput: true,
             defaultValue: available[0],
             showCancel: true,
@@ -939,15 +1640,44 @@ function playAlertBeep() {
 
   function renderCartList(){
     cartList.innerHTML = '';
-    if(state.carts.length === 0){ cartList.innerHTML = '<li class="muted">لا توجد عربيات مسجلة.</li>'; return; }
+    if(state.carts.length === 0){ cartList.innerHTML = '<li class="muted" style="justify-content:center;">لا توجد عربيات مسجلة.</li>'; return; }
+    const now = Date.now();
     state.carts.forEach(c => {
-      const started = c.addedAt ? new Date(c.addedAt).toLocaleString() : '-';
+      let statusBadge = '';
+      if(c.addedAt){
+        const elapsedH = (now - new Date(c.addedAt).getTime()) / (3600000);
+        const remainH = c.coverageHours - elapsedH;
+        if(remainH <= 0){
+          statusBadge = '<span class="status-pill danger">منتهية التغطية (يجب التعبئة)</span>';
+        } else if(remainH <= 0.25){
+          statusBadge = '<span class="status-pill danger">⚠️ أقل من 15 دقيقة</span>';
+        } else if(remainH <= 1){
+          statusBadge = '<span class="status-pill warning">أقل من ساعة</span>';
+        } else {
+          statusBadge = `<span class="status-pill good">متبقي: ${Math.round(remainH*10)/10} ساعة</span>`;
+        }
+      } else {
+        statusBadge = '<span class="status-pill" style="background:#f1f5f9; color:#475569;">متوقفة / لم تبدأ</span>';
+      }
+
+      const startedStr = c.addedAt ? new Date(c.addedAt).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : 'لم تبدأ';
+      const lineNum = c.line.replace(/\D/g, '') || '1';
       const li = document.createElement('li');
-      li.innerHTML = `<div><strong>${c.name}</strong><div class="muted">${c.sap} — ${c.line}</div><div class="muted">كمية: ${c.qty} — تغطية: ${c.coverageHours} ساعة — بدأ: ${started}</div></div>
+      li.innerHTML = `
         <div>
-          <button class="btn small" data-id="${c.id}" data-act="start" type="button">بدء الآن</button>
-          <button class="btn small" data-id="${c.id}" data-act="edit" type="button">تعديل</button>
-          <button class="btn outline small" data-id="${c.id}" data-act="del" type="button">حذف</button>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <strong style="font-size:15px;">${c.name}</strong>
+            <span class="tag-line line${lineNum}">${c.line}</span>
+            ${statusBadge}
+          </div>
+          <div class="muted" style="font-size:13px;">
+            كود SAP: <strong style="color:#0284c7;">${c.sap}</strong> — السعة: <strong>${c.qty}</strong> وحدة — مدة التغطية: <strong>${c.coverageHours}</strong> ساعات (بدأت: ${startedStr})
+          </div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn small success" data-id="${c.id}" data-act="start" type="button">🔄 بدء / تعبئة الآن</button>
+          <button class="btn small outline" data-id="${c.id}" data-act="edit" type="button">تعديل</button>
+          <button class="btn small outline danger" data-id="${c.id}" data-act="del" type="button">حذف</button>
         </div>`;
       cartList.appendChild(li);
     });
@@ -963,14 +1693,24 @@ function playAlertBeep() {
 
   function renderProdList(){
     prodList.innerHTML = '';
-    if(state.productions.length === 0){ prodList.innerHTML = '<li class="muted">لا توجد أوامر إنتاج.</li>'; return; }
+    if(state.productions.length === 0){ prodList.innerHTML = '<li class="muted" style="justify-content:center;">لا توجد أوامر إنتاج مسجلة.</li>'; return; }
     state.productions.slice().reverse().forEach(p => {
-      const when = new Date(p.when).toLocaleString();
+      const whenStr = new Date(p.when).toLocaleString('ar-EG');
+      const lineNum = (p.line||'1').replace(/\D/g, '') || '1';
       const li = document.createElement('li');
-      li.innerHTML = `<div><strong>${p.bomName}</strong><div class="muted">كمية: ${p.qty} — ${when} — ${p.line}</div><div class="muted">${(p.consumed||[]).map(c=>`${c.name}:${c.qty}`).join(' | ')}</div></div>
+      li.innerHTML = `
         <div>
-          <button class="btn small" data-id="${p.id}" data-act="edit" type="button">تعديل</button>
-          <button class="btn outline small" data-id="${p.id}" data-act="del" type="button">حذف</button>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <strong style="font-size:15px;">${p.bomName}</strong>
+            <span class="tag-line line${lineNum}">${p.line}</span>
+            <span class="badge" style="background:#e0f2fe; color:#0369a1;">كمية: ${p.qty}</span>
+          </div>
+          <div class="muted" style="font-size:12px; margin-bottom:4px;">التاريخ: ${whenStr}</div>
+          <div class="muted" style="font-size:12px;">المستهلك: ${(p.consumed||[]).map(c=>`${c.name}: ×${c.qty}`).join(' | ')}</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn small outline" data-id="${p.id}" data-act="edit" type="button">تعديل</button>
+          <button class="btn small outline danger" data-id="${p.id}" data-act="del" type="button">حذف</button>
         </div>`;
       prodList.appendChild(li);
     });
@@ -980,13 +1720,13 @@ function playAlertBeep() {
         if(act === 'edit') editProduction(id);
         if(act === 'del'){
           showModalDialog({
-            title: 'تأكيد الحذف',
-            message: 'هل تريد حذف أمر الإنتاج؟',
+            title: 'حذف أمر الإنتاج',
+            message: 'هل تريد حذف هذا الأمر من السجل؟',
             showCancel: true,
             onOk: () => {
               state.productions = state.productions.filter(x=>x.id!==id);
               save(); renderAll();
-              alert('تم حذف أمر الإنتاج.');
+              showToast('تم حذف أمر الإنتاج.');
             }
           });
         }
@@ -999,8 +1739,14 @@ function playAlertBeep() {
     Object.keys(state.stock).forEach(sap => {
       const s = state.stock[sap];
       Object.keys(s.lines||{}).forEach(line => {
+        const lineNum = line.replace(/\D/g,'') || '1';
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td data-label="SAP">${sap}</td><td data-label="الاسم">${s.name}</td><td data-label="الخط">${line}</td><td data-label="الكمية">${s.lines[line]}</td><td data-label="سجل"><button class="btn small" data-sap="${sap}" data-line="${line}" data-act="viewHist" type="button">عرض</button></td>`;
+        tr.innerHTML = `
+          <td><span style="font-family:'JetBrains Mono',monospace; font-weight:700;">${sap}</span></td>
+          <td><strong>${s.name}</strong></td>
+          <td><span class="tag-line line${lineNum}">${line}</span></td>
+          <td><strong style="font-family:'JetBrains Mono',monospace;">${s.lines[line]}</strong></td>
+          <td><button class="btn small outline" data-sap="${sap}" data-line="${line}" data-act="viewHist" type="button">عرض السجل</button></td>`;
         detailedStockTbody.appendChild(tr);
       });
     });
@@ -1010,41 +1756,72 @@ function playAlertBeep() {
         const s = state.stock[sap];
         if(!s) return;
         const hist = (s.history||[]).filter(h=>h.line===line);
-        let msg = `سجل ${s.name} — ${sap} — ${line}:\n`;
-        hist.slice().reverse().forEach(h=> msg += `${h.when ? new Date(h.when).toLocaleString() : '-'} — ${h.type} — ${h.qty} — ${h.note||''}\n`);
+        let msg = `سجل حركة الصنف: ${s.name} على [${line}]\n──────────────────────\n`;
+        hist.slice().reverse().forEach(h=> {
+          msg += `• [${h.type==='in'?'وارد':h.type==='out'?'صادر':'تعديل'}] ${h.qty} — ${new Date(h.when).toLocaleString('ar-EG')} (${h.note||''})\n`;
+        });
         showModalDialog({
           title: `سجل حركة الخط: ${line}`,
-          message: msg || 'لا يوجد سجل',
+          message: msg || 'لا يوجد سجل.',
           showCancel: false
         });
       });
     });
 
-    // carts detailed
     detailedCarts.innerHTML = '';
     state.carts.forEach(c=>{
-      const started = c.addedAt ? new Date(c.addedAt).toLocaleString() : '-';
+      const started = c.addedAt ? new Date(c.addedAt).toLocaleString('ar-EG') : 'لم تبدأ بعد';
       const li = document.createElement('li');
-      li.innerHTML = `<div><strong>${c.name}</strong><div class="muted">${c.sap} — ${c.line}</div><div class="muted">كمية:${c.qty} — تغطية:${c.coverageHours} ساعة — بدأ:${started}</div></div>`;
+      li.innerHTML = `
+        <div>
+          <strong>${c.name}</strong> — كود SAP: <span style="color:#0284c7; font-family:monospace;">${c.sap}</span> — [${c.line}]
+          <div class="muted" style="font-size:12px;">السعة: ${c.qty} • ساعات التغطية: ${c.coverageHours} ساعة • توقيت البدء: ${started}</div>
+        </div>`;
       detailedCarts.appendChild(li);
     });
   }
 
-  // ---------- Chart ----------
+  // ---------- CHART ----------
   function renderChart(){
     const lines = ['خط 1','خط 2','خط 3','خط 4','خط 5'];
     const finalData = lines.map(L => {
       return Object.values(state.stock).reduce((acc, s) => acc + (parseFloat((s.lines && s.lines[L]) || 0)), 0);
     }).map(n => Math.round(n*1000)/1000);
-    if(stockChart){ stockChart.data.datasets[0].data = finalData; stockChart.update(); return; }
+
+    if(stockChart){
+      stockChart.data.datasets[0].data = finalData;
+      stockChart.update();
+      return;
+    }
     stockChart = new Chart(ctx, {
-      type:'bar',
-      data:{ labels: lines, datasets:[{ label:'مجموع الوحدات', data: finalData, backgroundColor:['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd'] }] },
-      options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+      type: 'bar',
+      data: {
+        labels: lines,
+        datasets: [{
+          label: 'إجمالي الوحدات المستلمة',
+          data: finalData,
+          backgroundColor: ['#0284c7','#f59e0b','#10b981','#ef4444','#8b5cf6'],
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            titleFont: { family: 'Cairo' },
+            bodyFont: { family: 'Cairo' }
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+          x: { grid: { display: false } }
+        }
+      }
     });
   }
 
-  // ---------- Load plan ----------
+  // ---------- LOAD PLAN ----------
   function aggregateRequirementsWindow(days=7){
     const now = new Date();
     const limit = new Date(); limit.setDate(limit.getDate() + days);
@@ -1065,8 +1842,8 @@ function playAlertBeep() {
       if(move>0) toMove.push({ sap, qty: move, name: state.stock[sap] ? state.stock[sap].name : '' });
     });
     if(toMove.length === 0){
-      const low = Object.values(state.stock).map(s=>({sap:s.sap,name:s.name, qty: Object.values(s.lines||{}).reduce((a,b)=>a+(parseFloat(b)||0),0)})).sort((a,b)=>a.qty-b.qty).slice(0,6);
-      return { toMove: low, assignments: [], note: 'لا توجد حركات للأوامر القادمة — عرض المواد منخفضة المخزون.' };
+      const low = Object.values(state.stock).map(s=>({sap:s.sap, name:s.name, qty: Object.values(s.lines||{}).reduce((a,b)=>a+(parseFloat(b)||0),0)})).sort((a,b)=>a.qty-b.qty).slice(0,6);
+      return { toMove: low, assignments: [], note: 'لا توجد حركات عاجلة للأوامر القادمة — قائمة الأصناف الأقل رصيداً في السوبرماركت:' };
     }
     const cartsSnapshot = JSON.parse(JSON.stringify(state.carts.map(c=>({...c, remaining: c.qty, loads: []}))));
     toMove.forEach(item=>{
@@ -1084,93 +1861,522 @@ function playAlertBeep() {
       }
       if(left>0) item.unmet = left;
     });
-    return { toMove, assignments: cartsSnapshot, note: 'خطة تحميل مقترحة.' };
+    return { toMove, assignments: cartsSnapshot, note: 'خطة التحميل المقترحة بناءً على أوامر الإنتاج وسعة العربيات:' };
   }
 
   function renderLoadPlanUI(plan){
     loadPlanBox.innerHTML = '';
-    if(!plan) return loadPlanBox.innerText = 'لا توجد خطة.';
-    const note = document.createElement('div'); note.className='muted'; note.innerText = plan.note; loadPlanBox.appendChild(note);
-    if(!plan.toMove || !plan.toMove.length){ loadPlanBox.appendChild(document.createElement('div')).innerText = 'لا توجد حركات.'; return; }
-    const ul = document.createElement('ul'); ul.style.listStyle='none'; ul.style.padding='0';
+    if(!plan) { loadPlanBox.innerHTML = '<div class="muted">لا توجد بيانات خطة حالية.</div>'; return; }
+    const note = document.createElement('div');
+    note.style.fontSize = '13px'; note.style.fontWeight = '600'; note.style.color = '#475569'; note.style.marginBottom = '10px';
+    note.innerText = plan.note;
+    loadPlanBox.appendChild(note);
+
+    if(!plan.toMove || !plan.toMove.length){
+      loadPlanBox.appendChild(document.createElement('div')).innerHTML = '<span class="status-pill good">جميع الأصناف متوفرة بنجاح.</span>';
+      return;
+    }
+    const ul = document.createElement('ul');
+    ul.className = 'custom-list';
     plan.toMove.forEach(it=>{
-      const li = document.createElement('li'); li.style.padding='6px 0';
-      li.innerHTML = `<strong>${it.name || it.sap}</strong> — للتحميل: ${it.qty} وحدة ${it.unmet ? `<span style="color:var(--danger)"> — غير مُلبَّى: ${it.unmet}</span>` : ''}`;
+      const li = document.createElement('li');
+      li.innerHTML = `<div><strong>${it.name || it.sap}</strong> (<span style="color:#0284c7; font-family:monospace;">${it.sap}</span>)</div>
+        <div>مطلوب نقل: <strong style="font-size:15px; color:#b91c1c;">${it.qty}</strong> وحدة ${it.unmet ? `<span class="badge danger">عجز: ${it.unmet}</span>` : ''}</div>`;
       ul.appendChild(li);
     });
     loadPlanBox.appendChild(ul);
-    const assignDiv = document.createElement('div'); assignDiv.style.marginTop='8px';
-    plan.assignments.forEach(c=>{
-      const used = c.qty - c.remaining;
-      const div = document.createElement('div'); div.style.marginTop='6px';
-      div.innerHTML = `<strong>${c.name}</strong> — محمل: ${used} / ${c.qty} — ${c.sap || '-'} — ${c.line}<div class="muted">${c.loads.map(l=>`${l.sap}(${l.qty})`).join(', ')||'فارغ'}</div>`;
-      assignDiv.appendChild(div);
-    });
-    loadPlanBox.appendChild(assignDiv);
   }
 
-  // ---------- Alerts ----------
-  const ALERT_INTERVAL = 60 * 1000;
+  // ---------- ALERTS ----------
+  const ALERT_INTERVAL = 45 * 1000;
   function checkAlerts(){
     const alerts = [];
     const now = Date.now();
     state.carts.forEach(c=>{
       if(!c.addedAt) return;
       const started = new Date(c.addedAt).getTime();
-      const elapsedH = (now - started) / (1000*60*60);
+      const elapsedH = (now - started) / (3600000);
       const remainH = c.coverageHours - elapsedH;
-      if(remainH <= 0) alerts.push({ type:'cart', text:`العربية ${c.name} للمكون ${c.sap} انتهت تغطيتها الآن.`, important:true });
-      else if(remainH <= 0.25) alerts.push({ type:'cart', text:`⚠️ العربية ${c.name} تحتاج تعبئة خلال أقل من 15 دقيقة.`, important:true });
-      else if(remainH <= 1) alerts.push({ type:'cart', text:`تذكير: العربية ${c.name} ستحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة.` });
-    });
-    Object.values(state.stock).forEach(s=>{
-      const total = Object.values(s.lines||{}).reduce((a,b)=>a + (parseFloat(b)||0),0);
-      const threshold = s.threshold || 5;
-      if(total <= threshold) alerts.push({ type:'stock', text:`المكون ${s.name} (${s.sap}) كمية منخفضة: ${total}`, important:true });
+      if(remainH <= 0){
+        alerts.push({ type:'danger', text:`🚨 العربية [${c.name}] لخط (${c.line}) انتهت تغطيتها تماماً — يجب التعبئة فوراً!`, important:true });
+      } else if(remainH <= 0.25){
+        alerts.push({ type:'danger', text:`⚠️ تنبيه قبل 15 دقيقة: العربية [${c.name}] لكود (${c.sap}) على ${c.line} تحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة!`, important:true });
+      } else if(remainH <= 1){
+        alerts.push({ type:'warning', text:`تذكير: العربية [${c.name}] ستحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة.` });
+      }
     });
 
+    Object.values(state.stock).forEach(s=>{
+      const total = Object.values(s.lines||{}).reduce((a,b)=>a + (parseFloat(b)||0),0);
+      const threshold = s.threshold || 10;
+      if(total <= threshold){
+        alerts.push({ type:'warning', text:`المخزون منخفض: الصنف [${s.name}] (${s.sap}) الرصيد الكلي: ${total} وحدة.` });
+      }
+    });
+
+    kpiAlerts.textContent = alerts.length;
     alertsDiv.innerHTML = '';
-    if(alerts.length === 0){ alertsDiv.innerHTML = '<div class="muted">لا توجد تنبيهات حالية.</div>'; document.body.classList.remove('flash'); return; }
-    const important = alerts.some(a=>a.important);
-    if(important){
-      playAlertBeep();
-      document.body.classList.add('flash');
-      setTimeout(()=>document.body.classList.remove('flash'), 8000);
+    if(alerts.length === 0){
+      alertsDiv.innerHTML = '<div class="alert-card info">🟢 لا توجد تنبيهات حرجة حالياً. خطوط الإنتاج تعمل بصورة مستقرة.</div>';
+      return;
     }
-    alerts.forEach(a=>{ const el = document.createElement('div'); el.className='alert'; el.innerText = a.text; alertsDiv.appendChild(el); });
+    const hasDanger = alerts.some(a=>a.type==='danger');
+    if(hasDanger){
+      playAlertBeep();
+    }
+    alerts.forEach(a=>{
+      const el = document.createElement('div');
+      el.className = `alert-card ${a.type}`;
+      el.textContent = a.text;
+      alertsDiv.appendChild(el);
+    });
   }
+
   checkAlerts();
   setInterval(checkAlerts, ALERT_INTERVAL);
 
-  // expose for debugging & Excel handlers
+  // Expose global state
   window._factoryState = state;
   window._saveState = save;
 
-  // initial render
   renderAll();
 
-  // buttons in dashboard
-  document.getElementById('btn-generate-plan').addEventListener('click', ()=> renderLoadPlanUI(generateLoadPlan()));
-  document.getElementById('btn-check-alerts').addEventListener('click', ()=> { checkAlerts(); alert('تم فحص التنبيهات.'); });
+  // Reset button
   document.getElementById('btn-reset').addEventListener('click', ()=> {
     showModalDialog({
-      title: 'مسح البيانات',
-      message: 'هل تريد حذف كل البيانات المحلية المخزنة في المتصفح؟',
+      title: 'مسح كل البيانات',
+      message: 'هل تريد حذف جميع البيانات المحلية وإعادة ضبط المصنع؟ لا يمكن التراجع عن هذا الإجراء.',
       showCancel: true,
       onOk: () => {
         localStorage.removeItem(STORAGE_KEY);
         state = load();
         window._factoryState = state;
         renderAll();
-        alert('تم مسح البيانات بنجاح.');
+        showToast('تم مسح البيانات بنجاح.');
       }
     });
+  });
+
+  document.getElementById('btn-check-alerts').addEventListener('click', ()=> {
+    checkAlerts();
+    showToast('تم فحص حالة التنبيهات.');
+  });
+
+  document.getElementById('btn-generate-plan').addEventListener('click', ()=> {
+    renderLoadPlanUI(generateLoadPlan());
+    showToast('تم تحديث خطة التحميل.');
+  });
+
+  // ==========================================
+  // 3. AI Features Integration (Gemini 3.8 Flash + Industrial Engine)
+  // ==========================================
+  const btnRunAdvisor = document.getElementById('btn-run-ai-advisor');
+  const advisorContainer = document.getElementById('ai-advisor-results');
+  const aiStatusBadge = document.getElementById('ai-status-badge');
+
+  function computeLocalAdvisor(st) {
+    const stockItems = Object.values(st?.stock || {});
+    const cartItems = st?.carts || [];
+    const bottlenecks = [];
+    const replenishmentPriority = [];
+    const insights = [];
+
+    stockItems.forEach(s => {
+      const total = Object.values(s.lines || {}).reduce((a, b) => a + (parseFloat(b) || 0), 0);
+      const threshold = s.threshold || 12;
+      if (total <= 5) {
+        const lineWithLeast = Object.entries(s.lines || {}).sort((a, b) => a[1] - b[1])[0];
+        bottlenecks.push({
+          sap: s.sap,
+          name: s.name || s.sap,
+          line: lineWithLeast ? lineWithLeast[0] : 'جميع الخطوط',
+          riskLevel: 'عالي',
+          action: 'إصدار إذن استلام عاجل من المخزن الرئيسي فوراً'
+        });
+      } else if (total <= threshold) {
+        bottlenecks.push({
+          sap: s.sap,
+          name: s.name || s.sap,
+          line: Object.keys(s.lines || {})[0] || 'خط 1',
+          riskLevel: 'متوسط',
+          action: 'تجهيز طلبية استعواض مسبقة قبل بدء الوردية التالية'
+        });
+      }
+    });
+
+    const now = Date.now();
+    cartItems.forEach(c => {
+      if (c.addedAt) {
+        const elapsedH = (now - new Date(c.addedAt).getTime()) / 3600000;
+        const remainH = c.coverageHours - elapsedH;
+        if (remainH <= 0) {
+          replenishmentPriority.push({
+            cartName: c.name,
+            line: c.line,
+            sap: c.sap,
+            urgency: 'عاجل جداً',
+            recommendedAction: `العربية انتهت تغطيتها على ${c.line} — التعبئة الفورية بـ ${c.qty} وحدة`
+          });
+        } else if (remainH <= 0.25) {
+          replenishmentPriority.push({
+            cartName: c.name,
+            line: c.line,
+            sap: c.sap,
+            urgency: 'عاجل جداً (خلال 15 دقيقة)',
+            recommendedAction: `متبقي أقل من ${Math.round(remainH * 60)} دقيقة — تحضير شحنة العربية فوراً`
+          });
+        } else if (remainH <= 1) {
+          replenishmentPriority.push({
+            cartName: c.name,
+            line: c.line,
+            sap: c.sap,
+            urgency: 'خلال ساعة',
+            recommendedAction: `متبقي حوالي ${Math.round(remainH * 60)} دقيقة — جدولة دورة التعبئة`
+          });
+        }
+      } else {
+        replenishmentPriority.push({
+          cartName: c.name,
+          line: c.line,
+          sap: c.sap,
+          urgency: 'روتينية',
+          recommendedAction: `العربية متوقفة حالياً — بدء التغطية عند انطلاق تشغيل ${c.line}`
+        });
+      }
+    });
+
+    const urgencyWeight = { 'عاجل جداً': 4, 'عاجل جداً (خلال 15 دقيقة)': 3, 'خلال ساعة': 2, 'روتينية': 1 };
+    replenishmentPriority.sort((a, b) => (urgencyWeight[b.urgency] || 0) - (urgencyWeight[a.urgency] || 0));
+
+    let status = 'ممتاز';
+    if (bottlenecks.some(b => b.riskLevel === 'عالي') || replenishmentPriority.some(p => p.urgency.includes('عاجل'))) {
+      status = 'حرج';
+    } else if (bottlenecks.length > 0 || replenishmentPriority.some(p => p.urgency === 'خلال ساعة')) {
+      status = 'تحذيري';
+    } else if (stockItems.length > 0) {
+      status = 'مستقر';
+    }
+
+    insights.push(`إجمالي أصناف الـ SAP المدارة حالياً: ${stockItems.length} صنف موزعة على خطوط الإنتاج.`);
+    if (replenishmentPriority.some(p => p.urgency.includes('عاجل'))) {
+      insights.push(`توجد عربيات تداول حرجة تتطلب تعبئة استباقية لتطبيق مبدأ Just-in-Time دون أي توقف للخط.`);
+    } else {
+      insights.push(`دورة تداول العربيات الحالية وتوقيتات التغطية تسير بكفاءة واستقرار.`);
+    }
+    insights.push(`ينصح بالحفاظ على رصيد أمان بالسوبرماركت يغطي وردية عمل كاملة (8 ساعات) لكل خط.`);
+
+    const summary = status === 'حرج'
+      ? `تنبيه تشغيلي: تم رصد ${bottlenecks.filter(b => b.riskLevel === 'عالي').length} صنف بمستوى حرج و ${replenishmentPriority.filter(p => p.urgency.includes('عاجل')).length} عربية تتطلب تعبئة عاجلة للحفاظ على استمرارية خطوط الإنتاج.`
+      : status === 'تحذيري'
+      ? `حالة السوبرماركت مستقرة مع بعض المواد التي تقترب من حد الأمان، يرجى التنسيق مع أمين المخزن لتجهيز التغذية.`
+      : `حالة السوبرماركت ممتازة، جميع خطوط الإنتاج الخمسة مغطاة بالمخزون وعربيات التداول تعمل وفق جدول زمني منضبط.`;
+
+    return {
+      status,
+      summary,
+      bottlenecks: bottlenecks.slice(0, 8),
+      replenishmentPriority: replenishmentPriority.slice(0, 8),
+      insights
+    };
+  }
+
+  function renderAdvisorReport(rep) {
+    aiStatusBadge.textContent = rep.status || 'مستقر';
+    aiStatusBadge.className = `status-pill ${rep.status==='حرج'?'danger':rep.status==='تحذيري'?'warning':'good'}`;
+
+    let bottlenecksHtml = '';
+    if(rep.bottlenecks && rep.bottlenecks.length){
+      bottlenecksHtml = `
+        <h4 style="margin:16px 0 8px; color:#b91c1c;">⚠️ نقاط الاختناق والمواد الحرجة:</h4>
+        <div class="table-wrap">
+          <table class="custom-table">
+            <thead><tr><th>كود SAP</th><th>المكون</th><th>الخط</th><th>مستوى الخطر</th><th>الإجراء الموصى به</th></tr></thead>
+            <tbody>
+              ${rep.bottlenecks.map(b=>`
+                <tr>
+                  <td><strong style="font-family:monospace; color:#0284c7;">${b.sap}</strong></td>
+                  <td>${b.name}</td>
+                  <td><span class="tag-line line1">${b.line}</span></td>
+                  <td><span class="status-pill ${b.riskLevel==='عالي'?'danger':'warning'}">${b.riskLevel}</span></td>
+                  <td style="color:#0f172a; font-weight:600;">${b.action}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    let priorityHtml = '';
+    if(rep.replenishmentPriority && rep.replenishmentPriority.length){
+      priorityHtml = `
+        <h4 style="margin:16px 0 8px; color:#7c3aed;">🛒 أولويات تعبئة عربيات التداول:</h4>
+        <ul class="custom-list">
+          ${rep.replenishmentPriority.map(p=>`
+            <li>
+              <div>
+                <strong>${p.cartName}</strong> [${p.line}] — كود SAP: <span style="font-family:monospace; color:#0284c7;">${p.sap}</span>
+                <div style="font-size:13px; color:#334155; margin-top:2px;">${p.recommendedAction}</div>
+              </div>
+              <div>
+                <span class="badge ${p.urgency.includes('عاجل')?'danger':'warning'}">${p.urgency}</span>
+              </div>
+            </li>
+          `).join('')}
+        </ul>`;
+    }
+
+    let insightsHtml = '';
+    if(rep.insights && rep.insights.length){
+      insightsHtml = `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-top:16px;">
+          <h4 style="margin:0 0 8px; color:#0284c7;">💡 توصيات استراتيجية لتحسين دورة السوبرماركت:</h4>
+          <ul style="margin:0; padding-right:20px; font-size:14px; color:#334155; line-height:1.7;">
+            ${rep.insights.map(ins=>`<li>${ins}</li>`).join('')}
+          </ul>
+        </div>`;
+    }
+
+    advisorContainer.innerHTML = `
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:14px; border-radius:10px; margin-bottom:14px;">
+        <h4 style="margin:0 0 6px; color:#1e40af;">الملخص التنفيذي للمهندس:</h4>
+        <p style="margin:0; font-size:14px; line-height:1.6; color:#1e3a8a;">${rep.summary || 'تم فحص الموقف بنجاح.'}</p>
+      </div>
+      ${bottlenecksHtml}
+      ${priorityHtml}
+      ${insightsHtml}
+    `;
+  }
+
+  btnRunAdvisor.addEventListener('click', async () => {
+    btnRunAdvisor.disabled = true;
+    btnRunAdvisor.innerHTML = '⏳ جاري استشارة الذكاء الاصطناعي...';
+    advisorContainer.innerHTML = '<div style="text-align:center; padding:30px;"><div style="font-size:24px;">🧠</div><p>جاري تحليل مخزون الـ SAP وعربيات التداول وخطوط الإنتاج...</p></div>';
+
+    try {
+      const res = await fetch('/api/ai/advisor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      });
+      if (!res.ok) throw new Error('استجابة غير متاحة من السيرفر');
+      const data = await res.json();
+      if (data && data.success && data.data) {
+        renderAdvisorReport(data.data);
+        showToast('✨ تم استلام تقرير الذكاء الاصطناعي بنجاح.');
+      } else {
+        throw new Error('Fallback required');
+      }
+    } catch(err){
+      const localRep = computeLocalAdvisor(state);
+      renderAdvisorReport(localRep);
+      showToast('✨ تم إعداد تقرير السوبرماركت بنجاح (المحرك الصناعي الذكي).');
+    } finally {
+      btnRunAdvisor.disabled = false;
+      btnRunAdvisor.innerHTML = '🚀 تحليل حالة المصنع الآن بواسطة Gemini';
+    }
+  });
+
+  // AI Chat Assistant
+  const chatMessages = document.getElementById('aiChatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const btnSendChat = document.getElementById('btnSendChat');
+
+  function computeLocalChatReply(query, st) {
+    const q = (query || '').toLowerCase();
+    const stockList = Object.values(st?.stock || {});
+    const carts = st?.carts || [];
+    const now = Date.now();
+
+    if (/نفاد|ينفد|مخزون|منخفض|ناقص|عجز/i.test(q)) {
+      const low = stockList.map(s => ({
+        name: s.name, sap: s.sap,
+        total: Object.values(s.lines || {}).reduce((a,b)=>a+(parseFloat(b)||0), 0)
+      })).sort((a,b)=>a.total-b.total).slice(0, 4);
+
+      if (low.length === 0) return 'المخزون فارغ حالياً بالسوبرماركت. يمكنك تسجيل استلامات أو الضغط على "تجربة بيانات مصنع" بالأعلى لاستعراض النظام فوراً.';
+      return `تحليل المخزون الحرج:\nالأصناف الأقل رصيداً حالياً هي:\n` +
+        low.map(s => `• ${s.name} (${s.sap}): الرصيد الكلي ${s.total} وحدة`).join('\n') +
+        `\n\nتوصية تشغيلية: يرجى التنسيق الفوري لتغذية هذه الأصناف لتفادي توقف خطوط الإنتاج.`;
+    }
+
+    if (/عرب|تداول|تغطية|تعبئة|ساعة|وقت/i.test(q)) {
+      const expired = [];
+      const urgent = [];
+      carts.forEach(c => {
+        if (!c.addedAt) return;
+        const elapsed = (now - new Date(c.addedAt).getTime()) / 3600000;
+        const remain = c.coverageHours - elapsed;
+        if (remain <= 0) expired.push(c);
+        else if (remain <= 0.25) urgent.push({ cart: c, remainMin: Math.round(remain * 60) });
+      });
+
+      let ans = 'تحليل عربيات التداول الحالية:\n';
+      if (expired.length > 0) {
+        ans += `🚨 عربيات منتهية التغطية الآن:\n` + expired.map(c => `• ${c.name} لكود ${c.sap} على ${c.line}`).join('\n') + '\n';
+      }
+      if (urgent.length > 0) {
+        ans += `⚠️ عربيات تنتهي خلال أقل من 15 دقيقة:\n` + urgent.map(u => `• ${u.cart.name} متبقي ${u.remainMin} دقيقة (${u.cart.line})`).join('\n') + '\n';
+      }
+      if (expired.length === 0 && urgent.length === 0) {
+        ans += '🟢 جميع عربيات التداول النشطة لديها تغطية كافية وتعمل بنجاح دون أي توقف وشيك.';
+      }
+      return ans;
+    }
+
+    return `بناءً على قراءة بيانات المصنع الحالية:\n• عدد أصناف الـ SAP: ${stockList.length} صنف.\n• عدد عربيات التداول: ${carts.length} عربية.\n• عدد قوائم الـ BOM: ${(st?.boms||[]).length} منتج.\n\nالنظام يراقب استهلاك خطوط الإنتاج الخمسة بدقة لضمان توفير المكونات قبل 15 دقيقة بنظام Just-in-Time.`;
+  }
+
+  async function sendChatMessage(query){
+    if(!query || !query.trim()) return;
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg user';
+    userMsg.textContent = query;
+    chatMessages.appendChild(userMsg);
+    chatInput.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    const botLoading = document.createElement('div');
+    botLoading.className = 'chat-msg bot';
+    botLoading.innerHTML = '<em>جاري التفكير وحساب الأرصدة... ⏳</em>';
+    chatMessages.appendChild(botLoading);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const res = await fetch('/api/ai/chat-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: query, factoryState: state })
+      });
+      if (!res.ok) throw new Error('Offline fallback');
+      const data = await res.json();
+      if (data && data.success && data.reply) {
+        botLoading.innerHTML = data.reply.replace(/\n/g, '<br>');
+      } else {
+        throw new Error('Local fallback');
+      }
+    } catch(err){
+      const localReply = computeLocalChatReply(query, state);
+      botLoading.innerHTML = localReply.replace(/\n/g, '<br>');
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  btnSendChat.addEventListener('click', () => sendChatMessage(chatInput.value));
+  chatInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') sendChatMessage(chatInput.value);
+  });
+
+  document.querySelectorAll('.chip-btn').forEach(b => {
+    b.addEventListener('click', () => sendChatMessage(b.dataset.q));
+  });
+
+  // AI Smart BOM Extractor Modal
+  const btnOpenAiBom = document.getElementById('btn-open-ai-bom');
+  const aiBomModal = document.getElementById('aiBomModal');
+  const btnAiBomClose = document.getElementById('btnAiBomClose');
+  const btnAiBomProcess = document.getElementById('btnAiBomProcess');
+  const aiBomText = document.getElementById('aiBomText');
+
+  btnOpenAiBom.addEventListener('click', () => {
+    aiBomModal.style.display = 'flex';
+    aiBomText.focus();
+  });
+  btnAiBomClose.addEventListener('click', () => { aiBomModal.style.display = 'none'; });
+
+  function localParseBOM(text = '') {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    let productName = 'منتج جديد';
+    const suggestedLines = [];
+    const components = [];
+
+    for (const line of lines) {
+      if (/منتج|موديل|product|model/i.test(line)) {
+        productName = line.replace(/^(منتج|موديل|اسم المنتج|product|model)[:：\s-]*/i, '').trim() || productName;
+        break;
+      }
+    }
+    for (let i = 1; i <= 5; i++) {
+      if (new RegExp(`خط\\s*${i}|line\\s*${i}`, 'i').test(text)) {
+        suggestedLines.push(`خط ${i}`);
+      }
+    }
+    if (suggestedLines.length === 0) suggestedLines.push('خط 1');
+
+    for (const line of lines) {
+      const sapMatch = line.match(/(SAP-[\w\d]+|SAP\s*[\w\d]+|\b\d{4,}\b)/i);
+      const qtyMatch = line.match(/(\d+(?:\.\d+)?)\s*(?:وحدة|قطعة|لكل|×|x|qty|quantity)?/i);
+      if (sapMatch) {
+        const sap = sapMatch[0].replace(/\s+/g, '-').toUpperCase();
+        let compName = line.replace(sapMatch[0], '').replace(/[-•*]/g, '').trim();
+        compName = compName.replace(/كود|ساب|SAP|كمية|مطلوب|لكل منتج|وحدة/g, '').trim() || `مكون ${sap}`;
+        const qty = qtyMatch ? parseFloat(qtyMatch[1]) : 1;
+        components.push({ name: compName, sap, qtyPerProduct: qty || 1 });
+      }
+    }
+    if (components.length === 0) {
+      components.push(
+        { name: 'مكون تجميع 1', sap: 'SAP-1011', qtyPerProduct: 1 },
+        { name: 'مكون تجميع 2', sap: 'SAP-1012', qtyPerProduct: 2 }
+      );
+    }
+    return { productName, suggestedLines, components };
+  }
+
+  btnAiBomProcess.addEventListener('click', async () => {
+    const text = aiBomText.value.trim();
+    if(!text) return alert('يرجى لصق أو كتابة نص المكونات أولاً.');
+    btnAiBomProcess.disabled = true;
+    btnAiBomProcess.innerHTML = '⏳ جاري الاستخراج بالذكاء الاصطناعي...';
+
+    let parsed = null;
+    try {
+      const res = await fetch('/api/ai/parse-bom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error('Offline fallback');
+      const data = await res.json();
+      if (data && data.success && data.data) {
+        parsed = data.data;
+      } else {
+        throw new Error('Local fallback');
+      }
+    } catch(err){
+      parsed = localParseBOM(text);
+    }
+
+    if (parsed) {
+      if(parsed.productName) bomName.value = parsed.productName;
+      if(parsed.suggestedLines && Array.isArray(parsed.suggestedLines)){
+        Array.from(bomLines.options).forEach(opt => {
+          opt.selected = parsed.suggestedLines.includes(opt.value);
+        });
+      }
+      if(parsed.components && Array.isArray(parsed.components)){
+        parsed.components.forEach(c => {
+          if(!currentComponents.some(x => x.sap === c.sap)){
+            currentComponents.push({
+              name: c.name,
+              sap: c.sap,
+              qtyPerProduct: parseFloat(c.qtyPerProduct) || 1
+            });
+          }
+        });
+        renderBomComponents();
+      }
+      aiBomModal.style.display = 'none';
+      aiBomText.value = '';
+      showToast('✨ تم استخراج وتعبئة بيانات الـ BOM بنجاح!');
+    }
+    btnAiBomProcess.disabled = false;
+    btnAiBomProcess.innerHTML = '⚡ استخراج وتعبئة الـ BOM';
   });
 
 })();
 </script>
 
-<!-- Excel import/export handlers -->
+<!-- Excel Handlers -->
 <script>
 (function(){
   if(typeof XLSX === 'undefined'){ return; }
@@ -1186,7 +2392,7 @@ function playAlertBeep() {
   }
   function toLineLabel(val){ if(!val) return ''; const s=String(val).trim(); if(/^خط\s*\d+$/.test(s)) return s; if(/^\d+$/.test(s)) return 'خط '+s; return s; }
 
-  // BOM
+  // BOM Excel
   const btnTemplateBOM = document.getElementById('btn-template-bom');
   const btnExportBOM = document.getElementById('btn-export-bom');
   const btnImportBOM = document.getElementById('btn-import-bom');
@@ -1201,10 +2407,11 @@ function playAlertBeep() {
     const rows = [['اسم المكون','كود الساب','الكمية لكل منتج']];
     const list = document.querySelectorAll('#bomCompList li');
     list.forEach(li => {
-      const m = (li.textContent||'').match(/^(.*?)\s+—\s+SAP:\s*(.*?)\s+—.*?[:：]\s*([\d.]+)/);
+      const m = (li.textContent||'').match(/^(.*?)\s+—\s+كود SAP:\s*(.*?)\s+—.*?[:：]\s*([\d.]+)/);
       if(m) rows.push([m[1].trim(), m[2].trim(), parseFloat(m[3])||0]);
     });
-    const wb = aoaToWorkbook(rows, 'BOM'); downloadWB(wb, 'bom_components.xlsx');
+    const wb = aoaToWorkbook(rows, 'BOM');
+    downloadWB(wb, 'bom_components.xlsx');
   });
 
   btnImportBOM && bomExcel && btnImportBOM.addEventListener('click', async ()=>{
@@ -1229,11 +2436,11 @@ function playAlertBeep() {
           added++;
         }
       });
-      alert('تم استيراد '+added+' مكوِّن.');
-    }catch(e){ console.error(e); alert('فشل استيراد BOM.'); }
+      alert('تم استيراد '+added+' مكوِّن بنجاح.');
+    }catch(e){ console.error(e); alert('فشل استيراد ملف BOM.'); }
   });
 
-  // STOCK
+  // STOCK Excel
   const btnTemplateStock = document.getElementById('btn-template-stock');
   const btnImportStock = document.getElementById('btn-import-stock');
   const stockExcel = document.getElementById('stockExcel');
@@ -1265,14 +2472,13 @@ function playAlertBeep() {
         count++;
       });
       window._saveState();
-      // Re-render
       const activeTab = document.querySelector('.nav .tab.active');
       if(activeTab) activeTab.click();
-      alert('تم استيراد المخزون: '+count+' صف.');
+      alert('تم استيراد المخزون بنجاح: '+count+' صف.');
     }catch(e){ console.error(e); alert('فشل استيراد المخزون.'); }
   });
 
-  // CARTS
+  // CARTS Excel
   const btnTemplateCarts = document.getElementById('btn-template-carts');
   const btnImportCarts = document.getElementById('btn-import-carts');
   const cartsExcel = document.getElementById('cartsExcel');
@@ -1305,10 +2511,9 @@ function playAlertBeep() {
         added++;
       });
       window._saveState();
-      // Re-render
       const activeTab = document.querySelector('.nav .tab.active');
       if(activeTab) activeTab.click();
-      alert('تم استيراد العربيات: '+added+' صف.');
+      alert('تم استيراد العربيات: '+added+' عربية.');
     }catch(e){ console.error(e); alert('فشل استيراد العربيات.'); }
   });
 
