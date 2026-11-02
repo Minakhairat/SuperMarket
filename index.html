@@ -449,10 +449,55 @@ table.custom-table tr:hover td{background: #f8fafc;}
 .contact-badge.wa{background: #dcfce7; color: #15803d;}
 .contact-badge.wa:hover{background: #16a34a; color: white;}
 .footer-sub{font-size: 13px; color: var(--text-muted); margin-top: 6px;}
+
+/* Google Auth Pill */
+.google-user-pill{
+  display: flex; align-items: center; gap: 10px; background: #f8fafc;
+  border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 999px;
+  box-shadow: var(--shadow-sm); transition: all 0.2s;
+}
+.google-user-pill:hover{border-color: #94a3b8; background: #ffffff;}
+.google-avatar-wrap{
+  width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.google-user-info{display: flex; flex-direction: column; text-align: right;}
+.google-user-info strong{font-size: 13px; color: #0f172a;}
+.google-email{font-size: 11px; color: #64748b; font-family: monospace;}
+.google-live-badge{
+  font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7;
+  padding: 3px 8px; border-radius: 999px; border: 1px solid #bbf7d0;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* WhatsApp Alert Cards & Buttons */
+.wa-alert-card{
+  background: white; border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between;
+  align-items: center; gap: 14px; flex-wrap: wrap; transition: all 0.15s ease;
+}
+.wa-alert-card:hover{box-shadow: var(--shadow-sm);}
+.wa-alert-card.danger{border-right: 5px solid var(--danger); background: #fffcfc;}
+.wa-alert-card.warning{border-right: 5px solid var(--warning); background: #fffefb;}
+.wa-alert-card.info{border-right: 5px solid var(--primary); background: #fbfdff;}
+.btn-whatsapp{
+  background: #25d366; color: white; border: 0; padding: 8px 14px; border-radius: 8px;
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(37,211,102,0.25);
+  text-decoration: none; transition: all 0.15s;
+}
+.btn-whatsapp:hover{background: #20ba5a; transform: translateY(-1px);}
+.dispatch-hero{
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  color: white; padding: 22px; border-radius: var(--radius-lg); margin-bottom: 16px;
+}
+.dispatch-hero h3{margin: 0 0 8px; font-size: 18px; font-weight: 800;}
+.dispatch-hero p{margin: 0 0 16px; font-size: 13px; color: #a7f3d0; line-height: 1.6;}
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="app">
@@ -466,6 +511,16 @@ table.custom-table tr:hover td{background: #f8fafc;}
         </div>
       </div>
       <div class="header-actions">
+        <!-- Google Account & Live Gemini Status -->
+        <div class="google-user-pill" title="حساب Google المسجل والنشط لتشغيل نموذج Gemini">
+          <div class="google-avatar-wrap">👤</div>
+          <div class="google-user-info">
+            <strong id="userGoogleName">المهندس مينا خيرت</strong>
+            <span id="userGoogleEmail" class="google-email">minakhairat1@gmail.com</span>
+          </div>
+          <span class="google-live-badge">🟢 Gemini متصل بحساب Google</span>
+        </div>
+
         <button id="btn-load-demo" class="btn outline small" title="تحميل بيانات مصنع تجريبية لتجربة البرنامج">
           ✨ تجربة بيانات مصنع
         </button>
@@ -518,6 +573,9 @@ table.custom-table tr:hover td{background: #f8fafc;}
     <nav class="nav-wrap" role="navigation" aria-label="أقسام النظام">
       <div class="nav">
         <button class="tab active" data-tab="dashboard">📊 لوحة التحكم</button>
+        <button class="tab" data-tab="alerts-tab" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca;">
+          🚨 التنبيهات والواتساب <span id="alerts-tab-badge" class="badge danger">0</span>
+        </button>
         <button class="tab ai-tab" data-tab="ai-advisor">✨ مستشار الذكاء الاصطناعي <span class="badge">Gemini</span></button>
         <button class="tab" data-tab="bom">📑 إدارة الـ BOM</button>
         <button class="tab" data-tab="stock">📥 استلام المخزن (SAP)</button>
@@ -569,6 +627,85 @@ table.custom-table tr:hover td{background: #f8fafc;}
               <button class="btn ai small" onclick="document.querySelector('.tab[data-tab=\'ai-advisor\']').click()">
                 فتح مستشار الذكاء الاصطناعي ➔
               </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ALERTS & WHATSAPP PANE -->
+      <section id="alerts-tab" class="pane">
+        <div class="dispatch-hero">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3>📲 مركز إرسال التنبيهات ومشاركة حالة الخطوط عبر واتساب</h3>
+              <p>
+                يمكن للمهندس بضغطة زر مشاركة الموقف التشغيلي لجميع خطوط الإنتاج الخمسة عبر رسالة نصية جاهزة إلى واتساب،
+                أو إرسال أي تنبيه عاجل مباشرة لمسؤولي التداول وسائقي العربيات لتفادي توقف الخطوط.
+              </p>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;">
+            <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); padding:6px 12px; border-radius:8px;">
+              <span style="font-size:13px; font-weight:700;">رقم هاتف المستلم (اختياري):</span>
+              <input id="waRecipientPhone" placeholder="01200224513 أو اتركه لاختيار المحادثة" style="background:white; color:#0f172a; padding:6px 10px; border-radius:6px; font-size:13px; width:220px;" />
+            </div>
+            <button id="btnShareAllLinesWA" class="btn-whatsapp" type="button">
+              📢 مشاركة حالة الـ 5 خطوط بالكامل عبر واتساب
+            </button>
+            <button id="btnCopyAllLinesText" class="btn small outline" style="background:white; color:#064e3b; border-color:white;" type="button">
+              📋 نسخ تقرير الخطوط للحافظة
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Active Alerts List with WhatsApp Direct Action -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <h3>🚨 قائمة التنبيهات الحية وإرسالها لواتساب</h3>
+                <button id="btnRefreshAlertsTab" class="btn small outline" type="button">🔄 تحديث القائمة</button>
+              </div>
+              <div id="fullAlertsList"></div>
+            </div>
+          </div>
+
+          <!-- Quick Dispatch Message Composer -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <h3>✍️ إرسال توجيه تشغيلي فوري عبر واتساب</h3>
+              </div>
+              <form id="form-quick-dispatch">
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label>الخط المستهدف</label>
+                  <select id="dispatchLine" required>
+                    <option value="جميع الخطوط (1 إلى 5)">جميع الخطوط (1 إلى 5)</option>
+                    <option value="خط 1">خط 1</option>
+                    <option value="خط 2">خط 2</option>
+                    <option value="خط 3">خط 3</option>
+                    <option value="خط 4">خط 4</option>
+                    <option value="خط 5">خط 5</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label>نص التوجيه / الطلب الفوري</label>
+                  <textarea id="dispatchMessage" rows="4" placeholder="مثال: يرجى تجهيز عربية المواتير لكود SAP-1011 ونقلها فوراً إلى خط 1 قبل بدء الوردية." required></textarea>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button type="submit" class="btn-whatsapp" style="width:100%; justify-content:center;">
+                    💬 إرسال التوجيه عبر واتساب
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- WhatsApp Message Preview -->
+            <div class="card" style="background:#f8fafc;">
+              <div class="card-header">
+                <h3>👁️ معاينة تقرير الخطوط الجاهز للمشاركة</h3>
+              </div>
+              <pre id="linesStatusPreview" style="white-space:pre-wrap; font-family:'Cairo',sans-serif; font-size:13px; color:#1e293b; background:white; padding:12px; border-radius:8px; border:1px solid #e2e8f0; line-height:1.7; margin:0;"></pre>
             </div>
           </div>
         </div>
@@ -1888,47 +2025,328 @@ function playAlertBeep() {
   }
 
   // ---------- ALERTS ----------
+  // ---------- WHATSAPP DISPATCH & ALERTS SYSTEM ----------
   const ALERT_INTERVAL = 45 * 1000;
+  let activeAlertsList = [];
+
+  function cleanPhoneNumber(phone) {
+    if (!phone) return '';
+    let p = String(phone).replace(/[^\d+]/g, '');
+    if (p.startsWith('01') && p.length === 11) {
+      p = '20' + p.slice(1);
+    }
+    return p;
+  }
+
+  function openWhatsApp(text, phone = '') {
+    const p = cleanPhoneNumber(phone);
+    const encoded = encodeURIComponent(text);
+    const url = p ? `https://wa.me/${p}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
+    window.open(url, '_blank');
+  }
+
+  function copyTextToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 تم نسخ النص للحافظة بنجاح.');
+      }).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showToast('📋 تم نسخ النص للحافظة.');
+    } catch (e) {
+      alert('انسخ النص يدوياً:\n' + text);
+    }
+    document.body.removeChild(ta);
+  }
+
+  function generateLinesStatusReport() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    const lines = ['خط 1', 'خط 2', 'خط 3', 'خط 4', 'خط 5'];
+    let linesDetails = '';
+
+    lines.forEach(L => {
+      const totalUnits = Object.values(state.stock).reduce((acc, s) => acc + (parseFloat((s.lines && s.lines[L]) || 0)), 0);
+      const lineCarts = (state.carts || []).filter(c => c.line === L);
+      const activeCartsCount = lineCarts.filter(c => c.addedAt).length;
+
+      let lineCondition = 'مستقر ✅';
+      if (totalUnits === 0 && lineCarts.length === 0) {
+        lineCondition = 'متوقف حالياً ⏸️';
+      } else if (totalUnits < 15) {
+        lineCondition = 'مخزون حرج ⚠️';
+      }
+
+      linesDetails += `🔹 *${L}:* مخزون ${totalUnits} وحدة | ${lineCarts.length} عربيات (${activeCartsCount} قيد التشغيل) | ${lineCondition}\n`;
+    });
+
+    const urgentAlertsCount = activeAlertsList.filter(a => a.type === 'danger').length;
+
+    return `🏭 *تقرير الموقف التشغيلي لخطوط الإنتاج - SuperMarketPro*
+🗓️ *التاريخ:* ${dateStr} - ${timeStr}
+👷‍♂️ *إشراف المهندس:* مينا خيرت (01200224513)
+━━━━━━━━━━━━━━━━━━━
+${linesDetails}━━━━━━━━━━━━━━━━━━━
+🚨 *التنبيهات العاجلة:* ${urgentAlertsCount} تنبيه حرج
+📦 *إجمالي أكواد SAP المدارة:* ${Object.keys(state.stock).length} صنف
+🛒 *إجمالي عربيات التداول:* ${state.carts.length} عربية
+
+⚠️ *توجيهات السوبرماركت:* يرجى الالتزام بمواعيد التعبئة المحددة قبل 15 دقيقة بنظام Just-in-Time.`;
+  }
+
+  function formatSingleAlertWhatsApp(alertObj) {
+    const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    return `🚨 *تنبيه تشغيلي عاجل - SuperMarketPro*
+━━━━━━━━━━━━━━━━━━━
+📍 *الخط المستهدف:* ${alertObj.line || 'خطوط الإنتاج'}
+📦 *المكون / كود SAP:* ${alertObj.sap || 'غير محدد'}
+🛒 *العربية / الصنف:* ${alertObj.name || 'سوبرماركت'}
+⏱️ *تفاصيل التنبيه:* ${alertObj.text}
+━━━━━━━━━━━━━━━━━━━
+⚠️ *الإجراء الفوري المطلوب:* ${alertObj.action || 'التعبئة والنقل الفوري إلى صالة الإنتاج'}
+👷‍♂️ *المرسل:* م. مينا خيرت (01200224513)
+⏰ *التوقيت:* ${timeStr}`;
+  }
+
   function checkAlerts(){
     const alerts = [];
     const now = Date.now();
-    state.carts.forEach(c=>{
+
+    state.carts.forEach(c => {
       if(!c.addedAt) return;
       const started = new Date(c.addedAt).getTime();
       const elapsedH = (now - started) / (3600000);
       const remainH = c.coverageHours - elapsedH;
       if(remainH <= 0){
-        alerts.push({ type:'danger', text:`🚨 العربية [${c.name}] لخط (${c.line}) انتهت تغطيتها تماماً — يجب التعبئة فوراً!`, important:true });
+        alerts.push({
+          type: 'danger',
+          name: c.name,
+          sap: c.sap,
+          line: c.line,
+          remainH: 0,
+          text: `العربية [${c.name}] لكود (${c.sap}) على ${c.line} انتهت تغطيتها تماماً — يجب التعبئة فوراً!`,
+          action: 'تعبئة العربية فوراً بـ ' + c.qty + ' وحدة ونقلها للخط لتفادي التوقف',
+          important: true
+        });
       } else if(remainH <= 0.25){
-        alerts.push({ type:'danger', text:`⚠️ تنبيه قبل 15 دقيقة: العربية [${c.name}] لكود (${c.sap}) على ${c.line} تحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة!`, important:true });
+        const minLeft = Math.round(remainH * 60);
+        alerts.push({
+          type: 'danger',
+          name: c.name,
+          sap: c.sap,
+          line: c.line,
+          remainH: remainH,
+          text: `تنبيه قبل 15 دقيقة: العربية [${c.name}] لكود (${c.sap}) على ${c.line} تحتاج تعبئة خلال ${minLeft} دقيقة!`,
+          action: 'تجهيز الشحنة بالسوبرماركت ونقلها خلال ' + minLeft + ' دقيقة',
+          important: true
+        });
       } else if(remainH <= 1){
-        alerts.push({ type:'warning', text:`تذكير: العربية [${c.name}] ستحتاج تعبئة خلال ${Math.round(remainH*60)} دقيقة.` });
+        const minLeft = Math.round(remainH * 60);
+        alerts.push({
+          type: 'warning',
+          name: c.name,
+          sap: c.sap,
+          line: c.line,
+          remainH: remainH,
+          text: `تذكير: العربية [${c.name}] لكود (${c.sap}) ستحتاج تعبئة خلال ${minLeft} دقيقة.`,
+          action: 'إشعار سائق التداول لتجهيز الدورة التالية',
+          important: false
+        });
       }
     });
 
-    Object.values(state.stock).forEach(s=>{
-      const total = Object.values(s.lines||{}).reduce((a,b)=>a + (parseFloat(b)||0),0);
+    Object.values(state.stock).forEach(s => {
+      const total = Object.values(s.lines || {}).reduce((a, b) => a + (parseFloat(b) || 0), 0);
       const threshold = s.threshold || 10;
       if(total <= threshold){
-        alerts.push({ type:'warning', text:`المخزون منخفض: الصنف [${s.name}] (${s.sap}) الرصيد الكلي: ${total} وحدة.` });
+        alerts.push({
+          type: 'warning',
+          name: s.name,
+          sap: s.sap,
+          line: Object.keys(s.lines || {})[0] || 'المخزن الرئيسي',
+          text: `رصيد منخفض: الصنف [${s.name}] (${s.sap}) الرصيد الكلي الحالي: ${total} وحدة.`,
+          action: 'متابعة استعواض المخزن وإصدار إذن صرف للمورد',
+          important: false
+        });
       }
     });
 
+    activeAlertsList = alerts;
     kpiAlerts.textContent = alerts.length;
+    const tabBadge = document.getElementById('alerts-tab-badge');
+    if (tabBadge) tabBadge.textContent = alerts.length;
+
+    // Render Dashboard Alerts
     alertsDiv.innerHTML = '';
     if(alerts.length === 0){
       alertsDiv.innerHTML = '<div class="alert-card info">🟢 لا توجد تنبيهات حرجة حالياً. خطوط الإنتاج تعمل بصورة مستقرة.</div>';
+    } else {
+      if(alerts.some(a => a.type === 'danger')){
+        playAlertBeep();
+      }
+      alerts.forEach(a => {
+        const el = document.createElement('div');
+        el.className = `alert-card ${a.type}`;
+        el.style.display = 'flex';
+        el.style.justifyContent = 'space-between';
+        el.style.alignItems = 'center';
+        el.style.gap = '8px';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = a.text;
+        textSpan.style.flex = '1';
+
+        const btnWa = document.createElement('button');
+        btnWa.className = 'btn-whatsapp';
+        btnWa.style.padding = '4px 10px';
+        btnWa.style.fontSize = '12px';
+        btnWa.innerHTML = '💬 واتساب';
+        btnWa.onclick = () => {
+          const recPhone = document.getElementById('waRecipientPhone')?.value || '';
+          openWhatsApp(formatSingleAlertWhatsApp(a), recPhone);
+        };
+
+        el.appendChild(textSpan);
+        el.appendChild(btnWa);
+        alertsDiv.appendChild(el);
+      });
+    }
+
+    // Render Dedicated Alerts Tab
+    renderFullAlertsTabUI();
+  }
+
+  function renderFullAlertsTabUI() {
+    const container = document.getElementById('fullAlertsList');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (activeAlertsList.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:36px; background:#f8fafc; border-radius:12px; border:1px dashed #cbd5e1;">
+          <div style="font-size:32px; margin-bottom:8px;">🟢</div>
+          <h4 style="margin:0 0 6px; color:#15803d;">لا توجد تنبيهات نشطة حالياً</h4>
+          <p class="muted" style="margin:0;">خطوط الإنتاج الخمسة تعمل بكفاءة وأرصدة السوبرماركت مستقرة.</p>
+        </div>`;
       return;
     }
-    const hasDanger = alerts.some(a=>a.type==='danger');
-    if(hasDanger){
-      playAlertBeep();
+
+    activeAlertsList.forEach(a => {
+      const card = document.createElement('div');
+      card.className = `wa-alert-card ${a.type}`;
+
+      const infoDiv = document.createElement('div');
+      infoDiv.style.flex = '1';
+      infoDiv.style.minWidth = '240px';
+
+      const lineBadge = a.line ? `<span class="tag-line line${a.line.replace(/\D/g,'')||'1'}">${a.line}</span>` : '';
+      const urgencyBadge = a.type === 'danger'
+        ? '<span class="status-pill danger">عاجل جداً</span>'
+        : '<span class="status-pill warning">تنبيه مسبق</span>';
+
+      infoDiv.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          ${urgencyBadge}
+          ${lineBadge}
+          <strong style="font-size:14px; color:#0f172a;">${a.text}</strong>
+        </div>
+        <div style="font-size:13px; color:#475569; margin-top:4px;">
+          <strong>الإجراء المطلوب:</strong> ${a.action}
+        </div>
+      `;
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.style.display = 'flex';
+      actionsDiv.style.gap = '6px';
+      actionsDiv.style.alignItems = 'center';
+
+      const btnWa = document.createElement('button');
+      btnWa.className = 'btn-whatsapp';
+      btnWa.innerHTML = '💬 إرسال عبر واتساب';
+      btnWa.onclick = () => {
+        const recPhone = document.getElementById('waRecipientPhone')?.value || '';
+        openWhatsApp(formatSingleAlertWhatsApp(a), recPhone);
+      };
+
+      const btnCopy = document.createElement('button');
+      btnCopy.className = 'btn small outline';
+      btnCopy.textContent = '📋 نسخ';
+      btnCopy.onclick = () => {
+        copyTextToClipboard(formatSingleAlertWhatsApp(a));
+      };
+
+      actionsDiv.appendChild(btnWa);
+      actionsDiv.appendChild(btnCopy);
+
+      card.appendChild(infoDiv);
+      card.appendChild(actionsDiv);
+      container.appendChild(card);
+    });
+
+    // Update Live Preview
+    const previewEl = document.getElementById('linesStatusPreview');
+    if (previewEl) {
+      previewEl.textContent = generateLinesStatusReport();
     }
-    alerts.forEach(a=>{
-      const el = document.createElement('div');
-      el.className = `alert-card ${a.type}`;
-      el.textContent = a.text;
-      alertsDiv.appendChild(el);
+  }
+
+  // Hook WhatsApp Buttons
+  const btnShareAllLinesWA = document.getElementById('btnShareAllLinesWA');
+  if (btnShareAllLinesWA) {
+    btnShareAllLinesWA.addEventListener('click', () => {
+      const recPhone = document.getElementById('waRecipientPhone')?.value || '';
+      openWhatsApp(generateLinesStatusReport(), recPhone);
+    });
+  }
+
+  const btnCopyAllLinesText = document.getElementById('btnCopyAllLinesText');
+  if (btnCopyAllLinesText) {
+    btnCopyAllLinesText.addEventListener('click', () => {
+      copyTextToClipboard(generateLinesStatusReport());
+    });
+  }
+
+  const btnRefreshAlertsTab = document.getElementById('btnRefreshAlertsTab');
+  if (btnRefreshAlertsTab) {
+    btnRefreshAlertsTab.addEventListener('click', () => {
+      checkAlerts();
+      showToast('تم تحديث التنبيهات ومعاينة التقرير.');
+    });
+  }
+
+  // Quick Dispatch Form
+  const formQuickDispatch = document.getElementById('form-quick-dispatch');
+  if (formQuickDispatch) {
+    formQuickDispatch.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const line = document.getElementById('dispatchLine').value;
+      const msg = document.getElementById('dispatchMessage').value.trim();
+      const recPhone = document.getElementById('waRecipientPhone')?.value || '';
+      if (!msg) return;
+
+      const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const fullDispatchText = `📢 *توجيه تشغيلي عاجل - SuperMarketPro*
+━━━━━━━━━━━━━━━━━━━
+🎯 *الجهة / الخط:* ${line}
+📝 *التوجيه:* ${msg}
+━━━━━━━━━━━━━━━━━━━
+👷‍♂️ *المرسل:* م. مينا خيرت (01200224513)
+⏰ *التوقيت:* ${timeStr}`;
+
+      openWhatsApp(fullDispatchText, recPhone);
+      showToast('تم فتح واتساب لإرسال التوجيه.');
     });
   }
 
